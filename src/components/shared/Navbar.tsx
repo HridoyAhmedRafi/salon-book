@@ -94,7 +94,7 @@ export function Navbar() {
                 <SheetClose
                   render={
                     <Link
-                      href="/signup"
+                      href="/sign-up"
                       className={cn(
                         buttonVariants({ variant: "outline" }),
                         "hover:bg-primary/10 hover:text-foreground dark:hover:bg-primary/10 dark:hover:text-foreground"
