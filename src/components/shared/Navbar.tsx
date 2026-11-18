@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Menu } from "lucide-react";
 
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Sheet,
@@ -19,7 +19,7 @@ const navLinks = [
 
 const signUpClass = buttonVariants({ variant: "ghost" });
 
-export function SiteHeader() {
+export function Navbar() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4">
@@ -94,9 +94,7 @@ export function SiteHeader() {
                   Sign Up
                 </SheetClose>
                 <SheetClose
-                  render={
-                    <Link href="/signin" className={buttonVariants()} />
-                  }
+                  render={<Link href="/signin" className={buttonVariants()} />}
                 >
                   Sign In
                 </SheetClose>
