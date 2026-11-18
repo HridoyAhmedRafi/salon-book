@@ -1,5 +1,5 @@
+import { getFeaturedServices } from "@/lib/apis/get/services";
 import ServiceCard from "../browse-services/ServiceCard";
-import { getFeaturedServices } from "@/lib/apis/get/getFeaturedServices";
 
 const FeaturedSection = async () => {
   const services = await getFeaturedServices();
