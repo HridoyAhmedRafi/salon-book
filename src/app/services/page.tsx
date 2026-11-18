@@ -1,5 +1,6 @@
 import ServiceCard from "@/components/browse-services/ServiceCard";
 import ServiceFilters from "@/components/browse-services/ServiceFilters";
+import Footer from "@/components/shared/Footer";
 import { Navbar } from "@/components/shared/Navbar";
 
 import { getServices } from "@/lib/apis/get/services";
@@ -91,6 +92,7 @@ const BrowseServices = async ({ searchParams }: BrowseServicesProps) => {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 };

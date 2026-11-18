@@ -22,11 +22,10 @@ export async function Navbar() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4">
-        <Link
-          href="/"
-          className="rounded-sm text-xl font-semibold tracking-tight transition-colors hover:text-primary"
-        >
-          SalonBook
+        <Link href="/" className="inline-flex items-center">
+          <span className="text-2xl font-bold tracking-tight">
+            Salon<span className="text-[#d2a01f]">Book</span>
+          </span>
         </Link>
 
         <NavbarActions user={user} />
