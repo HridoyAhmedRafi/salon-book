@@ -12,6 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import SessionButton from "../user-session/SessionButton";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -19,10 +20,7 @@ const navLinks = [
   { label: "Why SalonBook", href: "/#why-salonbook" },
 ];
 
-const signUpClass = cn(
-  buttonVariants({ variant: "ghost" }),
-  "hover:bg-primary/10 hover:text-foreground dark:hover:bg-primary/10 dark:hover:text-foreground"
-);
+
 
 export function Navbar() {
   return (
@@ -50,15 +48,7 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           <ThemeToggle />
 
-          <Link
-            href="/sign-up"
-            className={`${signUpClass} hidden sm:inline-flex`}
-          >
-            Sign Up
-          </Link>
-          <Link href="/sign-in" className={buttonVariants()}>
-            Sign In
-          </Link>
+          <SessionButton></SessionButton>
 
           <Sheet>
             <SheetTrigger
@@ -97,7 +87,7 @@ export function Navbar() {
                       href="/sign-up"
                       className={cn(
                         buttonVariants({ variant: "outline" }),
-                        "hover:bg-primary/10 hover:text-foreground dark:hover:bg-primary/10 dark:hover:text-foreground"
+                        "hover:bg-primary/10 hover:text-foreground dark:hover:bg-primary/10 dark:hover:text-foreground",
                       )}
                     />
                   }
