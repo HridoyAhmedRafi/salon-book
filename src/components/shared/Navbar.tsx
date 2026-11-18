@@ -43,12 +43,12 @@ export function Navbar() {
           <ThemeToggle />
 
           <Link
-            href="/signup"
+            href="/sign-up"
             className={`${signUpClass} hidden sm:inline-flex`}
           >
             Sign Up
           </Link>
-          <Link href="/signin" className={buttonVariants()}>
+          <Link href="/sign-in" className={buttonVariants()}>
             Sign In
           </Link>
 
