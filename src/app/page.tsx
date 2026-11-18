@@ -1,5 +1,11 @@
+import BannerSection from "@/components/home/BannerSection";
+
 const HomePage = () => {
-  return <div>home page</div>;
+  return (
+    <main>
+      <BannerSection />
+    </main>
+  );
 };
 
 export default HomePage;
