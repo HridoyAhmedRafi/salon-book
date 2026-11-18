@@ -22,10 +22,35 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { AddService } from "@/lib/admin-apis/mutation/service";
+import { IService } from "@/types/service";
+import { toast } from "sonner";
 
 export default function AddServiceForm() {
   const router = useRouter();
   const [image, setImage] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+
+    const service: IService = {
+      serviceName: String(formData.get("serviceName") ?? ""),
+      category: String(formData.get("category") ?? ""),
+      description: String(formData.get("description") ?? ""),
+      price: Number(formData.get("price") ?? 0),
+      duration: Number(formData.get("duration") ?? 0),
+      image: String(formData.get("image") ?? ""),
+    };
+
+    const result = await AddService(service);
+    if (result.acknowledged === true) {
+      toast.success("Service added successfully!");
+      router.push("/dashboard/admin/manage-services");
+    }
+    // toast.success("Account created. Welcome to SalonBook!")
+    //
+  };
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] w-full justify-center px-4 py-8 md:px-8 md:py-10">
@@ -67,7 +92,7 @@ export default function AddServiceForm() {
           </CardHeader>
 
           <CardContent className="px-6 py-7 md:px-8 md:py-9">
-            <form className="space-y-7">
+            <form onSubmit={handleSubmit} className="space-y-7">
               {/* Service Name */}
               <div className="space-y-2">
                 <Label htmlFor="serviceName">Service Name</Label>
@@ -196,14 +221,14 @@ export default function AddServiceForm() {
                   type="button"
                   variant="outline"
                   onClick={() => router.back()}
-                  className="sm:min-w-32"
+                  className="cursor-pointer sm:min-w-32"
                 >
                   Cancel
                 </Button>
 
                 <Button
                   type="submit"
-                  className="bg-[#d1234c] text-white hover:bg-[#b91f43] sm:min-w-40"
+                  className="cursor-pointer bg-[#d1234c] text-white hover:bg-[#b91f43] sm:min-w-40"
                 >
                   Add Service
                 </Button>
