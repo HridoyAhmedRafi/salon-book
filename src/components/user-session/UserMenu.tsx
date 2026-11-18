@@ -1,10 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { LayoutDashboard, LogOut, UserRound } from "lucide-react";
-import { toast } from "sonner";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -15,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { authClient } from "@/lib/auth-client";
+import { useSignOut } from "./useSignOut";
 
 type UserMenuProps = {
   name: string;
@@ -28,31 +25,10 @@ const itemClass =
   "cursor-pointer gap-2 px-2 py-1.5 hover:bg-primary/10 focus:bg-primary/10 focus:text-foreground dark:hover:bg-primary/10";
 
 const UserMenu = ({ name, email, image }: UserMenuProps) => {
-  const router = useRouter();
-  const [signingOut, setSigningOut] = useState(false);
+  const { signingOut, signOut } = useSignOut();
 
   // Fallback letter when the user has no profile image.
   const initial = name.trim().charAt(0).toUpperCase() || "U";
-
-  const handleSignOut = async () => {
-    if (signingOut) return;
-
-    setSigningOut(true);
-
-    const { error } = await authClient.signOut();
-
-    setSigningOut(false);
-
-    if (error) {
-      toast.error(error.message ?? "Could not sign you out.");
-      return;
-    }
-
-    toast.success("Signed out. See you soon!");
-    router.push("/");
-    // Refresh so the header re-renders with the signed-out buttons.
-    router.refresh();
-  };
 
   return (
     <DropdownMenu>
@@ -112,7 +88,7 @@ const UserMenu = ({ name, email, image }: UserMenuProps) => {
 
         <DropdownMenuItem
           variant="destructive"
-          onClick={handleSignOut}
+          onClick={signOut}
           disabled={signingOut}
           className="cursor-pointer gap-2 px-2 py-1.5"
         >

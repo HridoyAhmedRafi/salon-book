@@ -23,10 +23,7 @@ const SessionButton = async () => {
 
   return (
     <>
-      <Link
-        href="/sign-up"
-        className={`${signUpClass} max-sm:hidden`}
-      >
+      <Link href="/sign-up" className={`${signUpClass} max-sm:hidden`}>
         Sign Up
       </Link>
 

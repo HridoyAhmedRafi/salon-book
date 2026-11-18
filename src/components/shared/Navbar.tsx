@@ -1,23 +1,9 @@
 import Link from "next/link";
-import { Menu } from "lucide-react";
 
 import { ThemeToggle } from "@/components/shared/theme-toggle";
-import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { navLinks } from "@/components/shared/nav-links";
 import SessionButton from "../user-session/SessionButton";
-
-const navLinks = [
-  { label: "Home", href: "/" },
-  { label: "Browse Services", href: "/services" },
-  { label: "Why SalonBook", href: "/#why-salonbook" },
-];
+import MobileMenu from "../user-session/MobileMenu";
 
 export function Navbar() {
   return (
@@ -43,41 +29,14 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <ThemeToggle />
+          {/* On mobile these live inside the menu instead. */}
+          <ThemeToggle className="max-md:hidden" />
 
-          <SessionButton></SessionButton>
+          <div className="hidden items-center gap-2 md:flex">
+            <SessionButton />
+          </div>
 
-          <Sheet>
-            <SheetTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="md:hidden"
-                  aria-label="Open menu"
-                />
-              }
-            >
-              <Menu />
-            </SheetTrigger>
-            <SheetContent side="right">
-              <SheetHeader>
-                <SheetTitle>Menu</SheetTitle>
-              </SheetHeader>
-
-              <nav className="flex flex-col gap-1 px-4">
-                {navLinks.map((link) => (
-                  <SheetClose
-                    key={link.href}
-                    render={<Link href={link.href} />}
-                    className="rounded-md px-2 py-2 text-sm font-medium transition-colors hover:bg-primary/10 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none dark:hover:bg-primary/10"
-                  >
-                    {link.label}
-                  </SheetClose>
-                ))}
-              </nav>
-            </SheetContent>
-          </Sheet>
+          <MobileMenu />
         </div>
       </div>
     </header>
