@@ -120,6 +120,7 @@ export default function AddServiceForm() {
                   <option value="" disabled>
                     Select a category
                   </option>
+                  <option value="">All Categories</option>
                   <option value="Hair">Hair</option>
                   <option value="Skin">Skin Care</option>
                   <option value="Nails">Nail Care</option>

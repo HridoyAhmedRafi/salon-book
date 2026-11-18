@@ -34,7 +34,7 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
       </div>
 
       {/* Service Information */}
-      <div className="space-y-1 p-5">
+      <div className="space-y-1 p-4">
         <div className="space-y-1">
           <h2 className="line-clamp-1 text-lg font-semibold transition-colors group-hover:text-[#d2a01f]">
             {service.serviceName}
@@ -46,7 +46,7 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
         </div>
 
         {/* Price and Duration */}
-        <div className="flex items-center justify-between border-t border-border pt-4">
+        <div className="flex items-center justify-between border-t border-border pt-2">
           <div>
             <p className="text-xs text-muted-foreground">Price</p>
             <p className="text-xl font-bold text-[#d2a01f]">৳{service.price}</p>
