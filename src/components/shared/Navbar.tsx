@@ -3,6 +3,7 @@ import { Menu } from "lucide-react";
 
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Sheet,
   SheetClose,
@@ -15,24 +16,31 @@ import {
 const navLinks = [
   { label: "Home", href: "/" },
   { label: "Browse Services", href: "/services" },
+  { label: "Why SalonBook", href: "/#why-salonbook" },
 ];
 
-const signUpClass = buttonVariants({ variant: "ghost" });
+const signUpClass = cn(
+  buttonVariants({ variant: "ghost" }),
+  "hover:bg-primary/10 hover:text-foreground dark:hover:bg-primary/10 dark:hover:text-foreground"
+);
 
 export function Navbar() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4">
-        <Link href="/" className="text-xl font-semibold tracking-tight">
+        <Link
+          href="/"
+          className="rounded-sm text-xl font-semibold tracking-tight transition-colors hover:text-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+        >
           SalonBook
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex">
+        <nav className="hidden items-center gap-1 md:flex">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              className="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none dark:hover:bg-primary/10"
             >
               {link.label}
             </Link>
@@ -75,7 +83,7 @@ export function Navbar() {
                   <SheetClose
                     key={link.href}
                     render={<Link href={link.href} />}
-                    className="rounded-md px-2 py-2 text-sm font-medium transition-colors hover:bg-muted"
+                    className="rounded-md px-2 py-2 text-sm font-medium transition-colors hover:bg-primary/10 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none dark:hover:bg-primary/10"
                   >
                     {link.label}
                   </SheetClose>
@@ -87,7 +95,10 @@ export function Navbar() {
                   render={
                     <Link
                       href="/signup"
-                      className={buttonVariants({ variant: "outline" })}
+                      className={cn(
+                        buttonVariants({ variant: "outline" }),
+                        "hover:bg-primary/10 hover:text-foreground dark:hover:bg-primary/10 dark:hover:text-foreground"
+                      )}
                     />
                   }
                 >

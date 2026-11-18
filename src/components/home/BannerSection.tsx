@@ -27,17 +27,20 @@ const BannerSection = () => {
         </p>
 
         <h1 className="mt-4 max-w-2xl text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
-          Look your best, book with ease.
+          Your best look starts here.
         </h1>
 
         <p className="mt-6 max-w-xl text-base text-white/80 sm:text-lg">
-          Discover trusted salons near you, compare services and prices, and
-          book the appointment that fits your schedule.
+          A neighbourhood salon for cuts, colour, and styling. Choose a
+          package, pick a time, and we&apos;ll take care of the rest.
         </p>
 
         <Link
           href="/services"
-          className={cn(buttonVariants({ size: "lg" }), "mt-8 px-5")}
+          className={cn(
+            buttonVariants({ size: "lg" }),
+            "mt-8 px-5 shadow-sm hover:shadow-md"
+          )}
         >
           Explore Salon Services
         </Link>

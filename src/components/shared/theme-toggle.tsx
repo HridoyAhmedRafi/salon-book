@@ -13,6 +13,7 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon"
       aria-label="Toggle theme"
+      className="hover:bg-primary/10 hover:text-foreground dark:hover:bg-primary/10 dark:hover:text-foreground"
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
     >
       {/* Both icons are always rendered; CSS shows the right one. */}
