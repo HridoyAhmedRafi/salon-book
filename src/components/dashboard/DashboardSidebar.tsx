@@ -20,7 +20,9 @@ import {
   ClipboardList,
 } from "lucide-react";
 import { headers } from "next/headers";
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Button } from "../ui/button";
 
 type Role = "customer" | "admin";
 
@@ -42,7 +44,7 @@ const menuItems: Record<Role, MenuItem[]> = {
     {
       _id: "my-appointments",
       name: "My Appointments",
-      url: "/dashboard/customer/appointments",
+      url: "/dashboard/customer/my-appointments",
       icon: CalendarDays,
     },
     {
@@ -112,6 +114,9 @@ export async function DashboardSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
+            <Link href={"/"}>
+              <Button className="cursor-pointer mb-4">Home</Button>
+            </Link>
             {items.map((project) => (
               <SidebarMenuItem key={project._id}>
                 <SidebarMenuButton render={<a href={project.url} />}>
