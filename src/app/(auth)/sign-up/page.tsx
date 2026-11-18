@@ -3,187 +3,239 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CircleAlert, CircleCheck, Loader2 } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Image as ImageIcon,
+  LoaderCircle,
+  Lock,
+  Mail,
+  Scissors,
+  User,
+} from "lucide-react";
+import { toast } from "sonner";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { signUp } from "@/lib/auth-client";
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const inputClass =
+  "w-full rounded-lg border border-border bg-transparent py-2.5 pl-10 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20";
 
 const SignUpPage = () => {
   const router = useRouter();
 
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const passwordIsValid =
+  const isPasswordValid =
     password.length >= 6 && /[A-Z]/.test(password) && /[a-z]/.test(password);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError("");
-    setSuccess("");
+    if (submitting) return;
 
-    if (fullName.trim().length < 2) {
-      setError("Please enter your full name.");
-      return;
-    }
-
-    if (!emailPattern.test(email.trim())) {
-      setError("Please enter a valid email address.");
-      return;
-    }
-
-    if (!passwordIsValid) {
-      setError(
+    if (!isPasswordValid) {
+      toast.error(
         "Password must be at least 6 characters and include one uppercase and one lowercase letter.",
       );
       return;
     }
 
-    if (imageUrl.trim() && !/^https?:\/\//i.test(imageUrl.trim())) {
-      setError("Image URL must start with http:// or https://");
-      return;
-    }
+    const formData = new FormData(event.currentTarget);
+    const name = String(formData.get("name") ?? "").trim();
+    const email = String(formData.get("email") ?? "").trim();
+    const image = String(formData.get("image") ?? "").trim();
 
-    setIsSubmitting(true);
+    setSubmitting(true);
 
-    const { error: authError } = await signUp.email({
-      name: fullName.trim(),
-      email: email.trim(),
-      password,
-      image: imageUrl.trim() || undefined,
-    });
+    try {
+      const { error } = await signUp.email({
+        name,
+        email,
+        password,
+        image: image || undefined,
+      });
 
-    setIsSubmitting(false);
+      if (error) {
+        toast.error(error.message ?? "Could not create your account.");
+        return;
+      }
 
-    if (authError) {
-      setError(authError.message ?? "Something went wrong. Please try again.");
-      return;
-    }
-
-    setSuccess("Account created. Taking you home…");
-    setTimeout(() => {
+      toast.success("Account created. Welcome to SalonBook!");
       router.push("/");
       router.refresh();
-    }, 900);
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleGoogleSignUp = () => {
+    // TODO: implement Google sign-up later.
   };
 
   return (
-    <div className="flex flex-1 items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="rounded-xl border bg-card p-6 text-card-foreground shadow-sm sm:p-8">
-          <h1 className="cursor-pointer text-2xl font-semibold tracking-tight">
-            Create your account
+    <main className="flex flex-1 items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md rounded-2xl border bg-card p-6 text-card-foreground shadow-sm sm:p-8">
+        <div className="text-center">
+          <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+            <Scissors className="size-6" />
+          </div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Create an account
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Book your next appointment in minutes.
           </p>
+        </div>
 
-          <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="full-name">Full Name</Label>
-              <Input
-                id="full-name"
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <div>
+            <label
+              htmlFor="name"
+              className="mb-1 block text-sm font-medium text-foreground"
+            >
+              Full Name
+            </label>
+            <div className="relative">
+              <User className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                id="name"
                 name="name"
+                type="text"
                 autoComplete="name"
-                placeholder="Jane Doe"
-                value={fullName}
-                onChange={(event) => setFullName(event.target.value)}
+                placeholder="Enter your full name"
                 required
+                className={inputClass}
               />
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
+          <div>
+            <label
+              htmlFor="email"
+              className="mb-1 block text-sm font-medium text-foreground"
+            >
+              Email Address
+            </label>
+            <div className="relative">
+              <Mail className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+              <input
                 id="email"
                 name="email"
                 type="email"
                 autoComplete="email"
-                placeholder="jane@example.com"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                placeholder="you@example.com"
                 required
+                className={inputClass}
               />
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
+          <div>
+            <label
+              htmlFor="image"
+              className="mb-1 block text-sm font-medium text-foreground"
+            >
+              Photo URL
+            </label>
+            <div className="relative">
+              <ImageIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                id="image"
+                name="image"
+                type="url"
+                autoComplete="url"
+                placeholder="https://example.com/photo.jpg"
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="mb-1 block text-sm font-medium text-foreground"
+            >
+              Password
+            </label>
+            <div className="relative">
+              <Lock className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+              <input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 autoComplete="new-password"
                 placeholder="Create a password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 required
+                className={`${inputClass} pr-11`}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword((value) => !value)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {showPassword ? (
+                  <EyeOff className="size-4" />
+                ) : (
+                  <Eye className="size-4" />
+                )}
+              </button>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="image-url">Profile Image URL</Label>
-              <Input
-                id="image-url"
-                name="image"
-                type="url"
-                autoComplete="url"
-                placeholder="https://example.com/photo.jpg"
-                value={imageUrl}
-                onChange={(event) => setImageUrl(event.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                Optional. Paste a link to your profile photo.
+            {password.length > 0 && !isPasswordValid && (
+              <p className="mt-2 text-xs text-destructive">
+                Use 6+ characters with one uppercase and one lowercase letter.
               </p>
-            </div>
-
-            {error && (
-              <Alert variant="destructive" aria-live="polite">
-                <CircleAlert />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
             )}
+          </div>
 
-            {success && (
-              <Alert aria-live="polite">
-                <CircleCheck />
-                <AlertDescription>{success}</AlertDescription>
-              </Alert>
-            )}
+          <button
+            type="submit"
+            disabled={!isPasswordValid || submitting}
+            aria-busy={submitting}
+            className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {submitting && <LoaderCircle className="size-4 animate-spin" />}
+            {submitting ? "Creating account..." : "Create Account"}
+          </button>
+        </form>
 
-            <Button
-              type="submit"
-              size="lg"
-              className="w-full"
-              disabled={isSubmitting}
-            >
-              {isSubmitting && <Loader2 className="animate-spin" />}
-              {isSubmitting ? "Creating account..." : "Create account"}
-            </Button>
-          </form>
-
-          <p className="mt-6 text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <Link
-              href="/sign-in"
-              className="font-medium text-foreground underline-offset-4 transition-colors hover:text-primary hover:underline"
-            >
-              Sign in
-            </Link>
-          </p>
+        <div className="my-6 flex items-center gap-4">
+          <div className="h-px flex-1 bg-border" />
+          <span className="text-xs text-muted-foreground">
+            OR CONTINUE WITH
+          </span>
+          <div className="h-px flex-1 bg-border" />
         </div>
+
+        <button
+          type="button"
+          onClick={handleGoogleSignUp}
+          disabled={submitting}
+          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-border py-2.5 text-sm font-medium text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <span aria-hidden className="text-base font-bold">
+            G
+          </span>
+          Continue with Google
+        </button>
+
+        <p className="mt-7 text-center text-sm text-muted-foreground">
+          Already have an account?{" "}
+          <Link
+            href="/sign-in"
+            className="font-semibold text-foreground underline-offset-4 transition-colors hover:text-primary hover:underline"
+          >
+            Sign in
+          </Link>
+        </p>
       </div>
-    </div>
+    </main>
   );
 };
 
