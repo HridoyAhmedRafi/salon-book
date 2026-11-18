@@ -2,8 +2,7 @@ import Link from "next/link";
 import { Menu } from "lucide-react";
 
 import { ThemeToggle } from "@/components/shared/theme-toggle";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetClose,
@@ -19,8 +18,6 @@ const navLinks = [
   { label: "Browse Services", href: "/services" },
   { label: "Why SalonBook", href: "/#why-salonbook" },
 ];
-
-
 
 export function Navbar() {
   return (
@@ -79,27 +76,6 @@ export function Navbar() {
                   </SheetClose>
                 ))}
               </nav>
-
-              <div className="mt-auto flex flex-col gap-2 p-4">
-                <SheetClose
-                  render={
-                    <Link
-                      href="/sign-up"
-                      className={cn(
-                        buttonVariants({ variant: "outline" }),
-                        "hover:bg-primary/10 hover:text-foreground dark:hover:bg-primary/10 dark:hover:text-foreground",
-                      )}
-                    />
-                  }
-                >
-                  Sign Up
-                </SheetClose>
-                <SheetClose
-                  render={<Link href="/signin" className={buttonVariants()} />}
-                >
-                  Sign In
-                </SheetClose>
-              </div>
             </SheetContent>
           </Sheet>
         </div>

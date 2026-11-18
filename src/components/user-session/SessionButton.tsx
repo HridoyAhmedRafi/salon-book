@@ -1,9 +1,11 @@
 import Link from "next/link";
-import React from "react";
-import { Button, buttonVariants } from "../ui/button";
+import { headers } from "next/headers";
+
+import { buttonVariants } from "../ui/button";
 import { cn } from "cn";
 import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import UserMenu from "./UserMenu";
+
 const signUpClass = cn(
   buttonVariants({ variant: "ghost" }),
   "hover:bg-primary/10 hover:text-foreground dark:hover:bg-primary/10 dark:hover:text-foreground",
@@ -15,24 +17,22 @@ const SessionButton = async () => {
   });
   const user = session?.user;
 
+  if (user) {
+    return <UserMenu name={user.name} email={user.email} image={user.image} />;
+  }
+
   return (
     <>
-      {user ? (
-        <Button>Sign Out</Button>
-      ) : (
-        <>
-          <Link
-            href="/sign-up"
-            className={`${signUpClass} hidden sm:inline-flex`}
-          >
-            Sign Up
-          </Link>
+      <Link
+        href="/sign-up"
+        className={`${signUpClass} max-sm:hidden`}
+      >
+        Sign Up
+      </Link>
 
-          <Link href="/sign-in" className={buttonVariants()}>
-            Sign In
-          </Link>
-        </>
-      )}
+      <Link href="/sign-in" className={buttonVariants()}>
+        Sign In
+      </Link>
     </>
   );
 };
