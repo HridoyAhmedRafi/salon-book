@@ -2,7 +2,7 @@ import ServiceCard from "@/components/browse-services/ServiceCard";
 import ServiceFilters from "@/components/browse-services/ServiceFilters";
 import { Navbar } from "@/components/shared/Navbar";
 
-import { getServices } from "@/lib/admin-apis/get/services";
+import { getServices } from "@/lib/apis/get/services";
 
 interface BrowseServicesProps {
   searchParams: Promise<{

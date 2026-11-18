@@ -22,7 +22,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { AddService } from "@/lib/admin-apis/mutation/service";
+import { AddService } from "@/lib/apis/mutation/service";
 import { IService } from "@/types/service";
 import { toast } from "sonner";
 
