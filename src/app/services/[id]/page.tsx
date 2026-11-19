@@ -109,11 +109,8 @@ const ServiceDetailsPage = async ({ params }: ServiceDetailsPageProps) => {
             {service.status === "active" ? (
               <AppointmentForm
                 serviceId={service._id}
-                serviceName={service.serviceName}
                 price={service.price}
                 duration={service.duration}
-                serviceCategory={service.category}
-                serviceImage={service.image}
               />
             ) : (
               <div className="rounded-2xl border border-border bg-card p-6">

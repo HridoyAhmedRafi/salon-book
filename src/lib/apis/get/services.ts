@@ -24,7 +24,6 @@ export const getServiceById = async (
   return res.json();
 };
 
-
 // get featured sservice
 export const getFeaturedServices = async (): Promise<IServicePost[]> => {
   const res = await fetch(

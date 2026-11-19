@@ -9,11 +9,8 @@ import { BookAppointment } from "@/lib/apis/mutation/appointment";
 
 interface ServiceBookingFormProps {
   serviceId: string;
-  serviceName: string;
   price: number;
   duration: number;
-  serviceCategory: string;
-  serviceImage: string;
 }
 
 const timeSlots = [
@@ -34,9 +31,6 @@ const AppointmentForm = ({
   serviceId,
   price,
   duration,
-  serviceName,
-  serviceCategory,
-  serviceImage,
 }: ServiceBookingFormProps) => {
   const [appointmentDate, setAppointmentDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
@@ -66,9 +60,6 @@ const AppointmentForm = ({
       timeSlot,
       message,
       price,
-      serviceName,
-      serviceCategory,
-      serviceImage,
     };
 
     try {
