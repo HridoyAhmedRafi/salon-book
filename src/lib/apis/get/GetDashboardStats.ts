@@ -1,4 +1,6 @@
-export const GetDashboardStats = async () => {
+import type { IAdminDashboardStats } from "@/types/AdminDashboardStats";
+
+export const GetDashboardStats = async (): Promise<IAdminDashboardStats> => {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/admin/dashboard-stats`,
     {
