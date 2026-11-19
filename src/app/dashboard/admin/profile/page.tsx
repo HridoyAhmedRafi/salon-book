@@ -1,7 +1,4 @@
-import {
-  AccountDetailsCard,
-  ProfileBookingCard,
-} from "@/components/dashboard/customer-dashboard/AccountDetailsCard";
+import { AccountDetailsCard } from "@/components/dashboard/customer-dashboard/AccountDetailsCard";
 import { CustomerProfileForm } from "@/components/dashboard/customer-dashboard/CustomerProfileForm";
 import { DashboardPageHeader } from "@/components/dashboard/shared/DashboardPageHeader";
 import { auth } from "@/lib/auth";
