@@ -32,6 +32,7 @@ const AppointmentForm = ({
   serviceId,
   price,
   duration,
+  serviceName,
 }: ServiceBookingFormProps) => {
   const [appointmentDate, setAppointmentDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
@@ -61,6 +62,7 @@ const AppointmentForm = ({
       timeSlot,
       message,
       price,
+      serviceName,
     };
 
     try {
