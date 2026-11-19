@@ -64,4 +64,4 @@ Single npm package: Next.js 16 App Router salon-booking app with public pages, c
 ## Repo state
 
 - No CI, no pre-commit hooks, no OpenCode config, no committed env files.
-- Dashboard/profile pages are largely placeholders, so expect to build features from scratch rather than extend existing patterns there.
+- Customer dashboard pages (overview, appointments, profile) are implemented; most admin pages and the admin profile remain stubs.
