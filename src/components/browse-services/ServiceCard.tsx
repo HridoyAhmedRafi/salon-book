@@ -1,4 +1,3 @@
-
 import Image from "next/image";
 import Link from "next/link";
 import { Clock, ArrowRight } from "lucide-react";
@@ -13,7 +12,7 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
   return (
     <div className="group overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
       {/* Service Image */}
-      <div className="relative aspect-[16/8] overflow-hidden bg-muted">
+      <div className="relative aspect-16/8 overflow-hidden bg-muted">
         {service.image ? (
           <Image
             src={service.image}

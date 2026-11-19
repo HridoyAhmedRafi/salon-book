@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import { CalendarDays, Clock3, MessageSquare } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+import { BookAppointment } from "@/lib/apis/mutation/service";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface ServiceBookingFormProps {
   serviceId: string;
@@ -26,13 +30,16 @@ const timeSlots = [
 
 const AppointmentForm = ({
   serviceId,
-  serviceName,
   price,
   duration,
 }: ServiceBookingFormProps) => {
   const [appointmentDate, setAppointmentDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
   const [message, setMessage] = useState("");
+  const router = useRouter();
+
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user;
 
   const today = new Date();
   const minDate = [
@@ -41,18 +48,25 @@ const AppointmentForm = ({
     String(today.getDate()).padStart(2, "0"),
   ].join("-");
 
-  const handleBooking = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleBooking = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    if (!user?.id) {
+      return;
+    }
     const bookingData = {
       serviceId,
-      serviceName,
+      customerId: user?.id,
       appointmentDate,
       timeSlot,
       message,
+      price,
     };
 
-    console.log(bookingData);
+    const result = await BookAppointment(bookingData);
+    if (result.acknowledged === true) {
+      toast.success("Appointment booked successfully!");
+      router.push("/services");
+    }
   };
 
   return (
