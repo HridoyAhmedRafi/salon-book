@@ -51,8 +51,15 @@ const SignInPage = () => {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    // TODO: implement Google login later.
+  const handleGoogleSignIn = async () => {
+    try {
+      await signIn.social({
+        provider: "google",
+      });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : String(error));
+      console.log("Something went wrong:", error);
+    }
   };
 
   return (

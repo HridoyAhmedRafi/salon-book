@@ -4,13 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
-  ImagePlus,
-  Scissors,
   Clock,
   DollarSign,
+  LoaderCircle,
+  Scissors,
 } from "lucide-react";
-import Image from "next/image";
 
+import { ImageUploadField } from "@/components/shared/ImageUploadField";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,9 +29,21 @@ import { toast } from "sonner";
 export default function AddServiceForm() {
   const router = useRouter();
   const [image, setImage] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (submitting || uploadingImage) {
+      return;
+    }
+
+    if (!image) {
+      toast.error("Upload a service image.");
+      return;
+    }
+
     const formData = new FormData(e.currentTarget);
 
     const service: IService = {
@@ -40,16 +52,30 @@ export default function AddServiceForm() {
       description: String(formData.get("description") ?? ""),
       price: Number(formData.get("price") ?? 0),
       duration: Number(formData.get("duration") ?? 0),
-      image: String(formData.get("image") ?? ""),
+      image,
     };
 
-    const result = await AddService(service);
-    if (result.acknowledged === true) {
-      toast.success("Service added successfully!");
-      router.push("/dashboard/admin/manage-services");
+    setSubmitting(true);
+
+    try {
+      const result = await AddService(service);
+
+      if (result.acknowledged === true) {
+        toast.success("Service added successfully!");
+        router.push("/dashboard/admin/manage-services");
+        return;
+      }
+
+      toast.error("Could not add the service. Please try again.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Could not add the service. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
     }
-    // toast.success("Account created. Welcome to SalonBook!")
-    //
   };
 
   return (
@@ -183,38 +209,15 @@ export default function AddServiceForm() {
               </div>
 
               {/* Image */}
-              <div className="space-y-3">
-                <Label htmlFor="image">Service Image URL</Label>
-
-                <Input
-                  id="image"
-                  name="image"
-                  type="url"
-                  placeholder="https://example.com/service-image.jpg"
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  className="h-11"
-                  required
-                />
-
-                {image ? (
-                  <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-border bg-muted">
-                    <Image
-                      src={image}
-                      alt="Service preview"
-                      fill
-                      sizes="(max-width: 768px) 100vw, 1024px"
-                      className="object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="flex min-h-56 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border bg-muted/30 text-muted-foreground">
-                    <ImagePlus className="size-10" />
-
-                    <p className="text-sm">Image preview will appear here</p>
-                  </div>
-                )}
-              </div>
+              <ImageUploadField
+                value={image}
+                onChange={setImage}
+                onUploadingChange={setUploadingImage}
+                label="Service image"
+                description="PNG, JPEG, WebP or GIF · up to 5 MB."
+                required
+                disabled={submitting}
+              />
 
               {/* Actions */}
               <div className="flex flex-col-reverse gap-3 border-t border-border/60 pt-6 sm:flex-row sm:justify-end">
@@ -229,9 +232,13 @@ export default function AddServiceForm() {
 
                 <Button
                   type="submit"
+                  disabled={submitting || uploadingImage}
                   className="cursor-pointer bg-[#d1234c] text-white hover:bg-[#b91f43] sm:min-w-40"
                 >
-                  Add Service
+                  {submitting ? (
+                    <LoaderCircle className="animate-spin" />
+                  ) : null}
+                  {submitting ? "Adding..." : "Add Service"}
                 </Button>
               </div>
             </form>

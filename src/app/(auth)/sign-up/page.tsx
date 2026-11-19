@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { signUp } from "@/lib/auth-client";
+import { signIn, signUp } from "@/lib/auth-client";
 
 const inputClass =
   "w-full rounded-lg border border-border bg-transparent py-2.5 pl-10 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20";
@@ -71,10 +71,16 @@ const SignUpPage = () => {
     }
   };
 
-  const handleGoogleSignUp = () => {
-    // TODO: implement Google sign-up later.
+  const handleGoogleSignUp = async () => {
+    try {
+      await signIn.social({
+        provider: "google",
+      });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : String(error));
+      console.log("Something went wrong:", error);
+    }
   };
-
   return (
     <main className="flex flex-1 items-center justify-center px-4 py-12">
       <div className="w-full max-w-md rounded-2xl border bg-card p-6 text-card-foreground shadow-sm sm:p-8">

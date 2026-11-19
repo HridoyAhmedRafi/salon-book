@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ImagePlus, LoaderCircle, Pencil } from "lucide-react";
+import { LoaderCircle, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
+import { ImageUploadField } from "@/components/shared/ImageUploadField";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -47,8 +47,7 @@ export function EditServiceButton({ service }: EditServiceButtonProps) {
   const [price, setPrice] = useState(String(service.price));
   const [duration, setDuration] = useState(String(service.duration));
   const [image, setImage] = useState(service.image);
-
-  const previewImage = getValidImageUrl(image);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const resetForm = () => {
     setServiceName(service.serviceName);
@@ -57,6 +56,7 @@ export function EditServiceButton({ service }: EditServiceButtonProps) {
     setPrice(String(service.price));
     setDuration(String(service.duration));
     setImage(service.image);
+    setUploadingImage(false);
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -70,7 +70,7 @@ export function EditServiceButton({ service }: EditServiceButtonProps) {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (submitting) {
+    if (submitting || uploadingImage) {
       return;
     }
 
@@ -86,7 +86,7 @@ export function EditServiceButton({ service }: EditServiceButtonProps) {
     }
 
     if (!nextImage) {
-      toast.error("Enter a valid image URL.");
+      toast.error("Upload a service image.");
       return;
     }
 
@@ -229,36 +229,15 @@ export function EditServiceButton({ service }: EditServiceButtonProps) {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor={`image-${service._id}`}>Image URL</Label>
-
-              <Input
-                id={`image-${service._id}`}
-                type="url"
-                value={image}
-                onChange={(event) => setImage(event.target.value)}
-                className="h-10"
-                required
-              />
-
-              {previewImage ? (
-                <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-border bg-muted">
-                  <Image
-                    src={previewImage}
-                    alt="Service preview"
-                    fill
-                    unoptimized
-                    sizes="(max-width: 768px) 100vw, 640px"
-                    className="object-cover"
-                  />
-                </div>
-              ) : (
-                <div className="flex min-h-32 flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-muted/30 text-muted-foreground">
-                  <ImagePlus className="size-6" />
-                  <p className="text-xs">Image preview will appear here</p>
-                </div>
-              )}
-            </div>
+            <ImageUploadField
+              value={image}
+              onChange={setImage}
+              onUploadingChange={setUploadingImage}
+              label="Service image"
+              description="PNG, JPEG, WebP or GIF · up to 5 MB."
+              required
+              disabled={submitting}
+            />
           </div>
 
           <DialogFooter>
@@ -268,7 +247,7 @@ export function EditServiceButton({ service }: EditServiceButtonProps) {
 
             <Button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || uploadingImage}
               className="min-w-32 cursor-pointer"
             >
               {submitting ? <LoaderCircle className="animate-spin" /> : null}

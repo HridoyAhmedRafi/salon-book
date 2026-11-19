@@ -57,6 +57,7 @@ const AppointmentForm = ({
       router.push("/sign-in");
       return;
     }
+
     const bookingData = {
       serviceId,
       serviceName,
