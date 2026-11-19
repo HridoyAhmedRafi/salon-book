@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { CalendarDays, Clock3, MessageSquare } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
-import { BookAppointment } from "@/lib/apis/mutation/service";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { BookAppointment } from "@/lib/apis/mutation/appointment";
 
 interface ServiceBookingFormProps {
   serviceId: string;
@@ -51,6 +51,7 @@ const AppointmentForm = ({
   const handleBooking = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!user?.id) {
+      router.push("/sign-in");
       return;
     }
     const bookingData = {
