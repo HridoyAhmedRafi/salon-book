@@ -1,6 +1,43 @@
+import { CircleAlert } from "lucide-react";
+
+import { AdminAppointmentsTable } from "@/components/dashboard/admin-appointments/AdminAppointmentsTable";
+import { DashboardPageHeader } from "@/components/dashboard/shared/DashboardPageHeader";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { getAllAppointments } from "@/lib/apis/get/appointment";
+import type { IAdminAppointment } from "@/types/appointment";
+
 const ManageAppointments = async () => {
-  // const appointments=await
-  return <div>ManageAppointments</div>;
+  let appointments: IAdminAppointment[] = [];
+  let loadFailed = false;
+
+  try {
+    appointments = await getAllAppointments();
+  } catch {
+    loadFailed = true;
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-7xl space-y-8">
+      <DashboardPageHeader
+        eyebrow="Bookings"
+        title="Appointments"
+        description="Review every customer booking request, confirm a pending appointment, or cancel one that can no longer go ahead."
+      />
+
+      {loadFailed ? (
+        <Alert variant="destructive">
+          <CircleAlert />
+          <AlertTitle>Could not load appointments</AlertTitle>
+          <AlertDescription>
+            Refresh the page to try again. If the problem continues, check that
+            the backend API is running.
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <AdminAppointmentsTable appointments={appointments} />
+      )}
+    </div>
+  );
 };
 
 export default ManageAppointments;

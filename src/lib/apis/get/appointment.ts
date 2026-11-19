@@ -1,4 +1,5 @@
 import type {
+  IAdminAppointment,
   IAppointmentDocument,
   IAppointmentPost,
 } from "@/types/appointment";
@@ -18,6 +19,15 @@ const toAppointment = (document: IAppointmentDocument): IAppointmentPost => ({
   createdAt: document.postedAt,
 });
 
+const toAdminAppointment = (
+  document: IAppointmentDocument,
+): IAdminAppointment => ({
+  ...toAppointment(document),
+  customerName: document.customerName || "Unknown customer",
+  customerEmail: document.customerEmail || "—",
+  customerImage: document.customerImage,
+});
+
 export const getAppointmentByUserId = async (
   id: string,
 ): Promise<IAppointmentPost[]> => {
@@ -35,4 +45,21 @@ export const getAppointmentByUserId = async (
   const data: IAppointmentDocument[] = await res.json();
 
   return Array.isArray(data) ? data.map(toAppointment) : [];
+};
+
+/** Loads every appointment request for the admin dashboard. */
+export const getAllAppointments = async (): Promise<IAdminAppointment[]> => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/admin/appointments`,
+    {
+      cache: "no-store",
+    },
+  );
+
+  if (!res.ok) {
+    throw new Error(`Failed to load appointments (${res.status})`);
+  }
+
+  const data: IAppointmentDocument[] = await res.json();
+  return Array.isArray(data) ? data.map(toAdminAppointment) : [];
 };

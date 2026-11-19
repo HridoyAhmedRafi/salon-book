@@ -13,8 +13,17 @@ export interface IAppointment {
   price: number;
 }
 
+/** Customer details embedded in an appointment document. */
+export interface IAppointmentCustomer {
+  customerName?: string;
+  customerEmail?: string;
+  customerImage?: string;
+}
+
 /** Appointment document exactly as returned by the API. */
-export interface IAppointmentDocument extends IAppointment {
+export interface IAppointmentDocument
+  extends IAppointment,
+    IAppointmentCustomer {
   _id: string;
   Status: AppointmentStatus;
   PaymentStatus: PaymentStatus;
@@ -27,4 +36,11 @@ export interface IAppointmentPost extends IAppointment {
   status: AppointmentStatus;
   paymentStatus: PaymentStatus;
   createdAt: string;
+}
+
+/** Normalised appointment returned by the admin appointments API. */
+export interface IAdminAppointment extends IAppointmentPost {
+  customerName: string;
+  customerEmail: string;
+  customerImage?: string;
 }
