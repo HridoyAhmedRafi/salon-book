@@ -67,24 +67,6 @@ const Footer = () => {
                   Browse Services
                 </Link>
               </li>
-
-              <li>
-                <Link
-                  href="/login"
-                  className="transition-colors hover:text-[#d2a01f]"
-                >
-                  Sign In
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/register"
-                  className="transition-colors hover:text-[#d2a01f]"
-                >
-                  Sign Up
-                </Link>
-              </li>
             </ul>
           </div>
 
