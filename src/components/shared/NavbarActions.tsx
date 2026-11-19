@@ -58,7 +58,7 @@ export default function NavbarActions({ user }: NavbarActionsProps) {
           <Link
             key={link.href}
             href={link.href}
-            className="rounded-md px-3 py-2 text-sm text-black transition-colors  hover:bg-primary/10 hover:text-foreground dark:hover:bg-primary/10"
+            className="rounded-md px-3 py-2 text-sm text-foreground transition-colors hover:bg-primary/10 dark:hover:bg-primary/10"
           >
             {link.label}
           </Link>
