@@ -62,10 +62,19 @@ const AppointmentForm = ({
       price,
     };
 
-    const result = await BookAppointment(bookingData);
-    if (result.acknowledged === true) {
-      toast.success("Appointment booked successfully!");
-      router.push("/services");
+    try {
+      const result = await BookAppointment(bookingData);
+
+      if (result.acknowledged === true) {
+        toast.success("Appointment booked successfully!");
+        router.push("/services");
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Something went wrong!");
+      }
     }
   };
 
@@ -183,7 +192,7 @@ const AppointmentForm = ({
         <button
           type="submit"
           disabled={!appointmentDate || !timeSlot}
-          className="w-full rounded-lg bg-[#d2a01f] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#b88712] disabled:cursor-not-allowed disabled:opacity-50"
+          className="cursor-pointer w-full rounded-lg bg-[#d2a01f] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#b88712] disabled:cursor-not-allowed disabled:opacity-50"
         >
           Request Appointment
         </button>
