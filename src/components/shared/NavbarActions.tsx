@@ -30,6 +30,7 @@ export default function NavbarActions({ user }: NavbarActionsProps) {
   const initial = user?.name.trim().charAt(0).toUpperCase() || "U";
 
   const dashboardLink = user ? `/dashboard/${user.role}` : "/dashboard";
+  const profileLink = `/dashboard/${user?.role}/profile`;
 
   const handleSignOut = async () => {
     if (signingOut) return;
@@ -119,7 +120,7 @@ export default function NavbarActions({ user }: NavbarActionsProps) {
               </DropdownMenuItem>
 
               <DropdownMenuItem
-                render={<Link href="/my-profile" />}
+                render={<Link href={profileLink} />}
                 className={itemClass}
               >
                 <UserRound />
