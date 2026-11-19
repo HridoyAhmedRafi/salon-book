@@ -10,6 +10,8 @@ export interface IAppointment {
   message?: string;
   price: number;
   serviceName: string;
+  serviceCategory: string;
+  serviceImage: string;
 }
 
 /** Appointment document exactly as returned by the API. */

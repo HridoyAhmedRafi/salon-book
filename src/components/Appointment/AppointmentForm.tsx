@@ -12,6 +12,8 @@ interface ServiceBookingFormProps {
   serviceName: string;
   price: number;
   duration: number;
+  serviceCategory: string;
+  serviceImage: string;
 }
 
 const timeSlots = [
@@ -33,6 +35,8 @@ const AppointmentForm = ({
   price,
   duration,
   serviceName,
+  serviceCategory,
+  serviceImage,
 }: ServiceBookingFormProps) => {
   const [appointmentDate, setAppointmentDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
@@ -63,6 +67,8 @@ const AppointmentForm = ({
       message,
       price,
       serviceName,
+      serviceCategory,
+      serviceImage,
     };
 
     try {
