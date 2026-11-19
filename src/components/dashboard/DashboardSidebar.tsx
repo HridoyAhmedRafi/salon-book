@@ -103,7 +103,7 @@ export async function DashboardSidebar() {
   const role = session?.user.role;
 
   if (!role || (role !== "customer" && role !== "admin")) {
-    redirect("/login");
+    redirect("/sign-in");
   }
 
   const items = menuItems[role];

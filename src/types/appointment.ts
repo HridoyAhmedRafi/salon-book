@@ -11,6 +11,15 @@ export interface IAppointment {
   price: number;
 }
 
+/** Appointment document exactly as returned by the API. */
+export interface IAppointmentDocument extends IAppointment {
+  _id: string;
+  Status: AppointmentStatus;
+  PaymentStatus: PaymentStatus;
+  postedAt: string;
+}
+
+/** Normalised appointment used across the UI. */
 export interface IAppointmentPost extends IAppointment {
   _id: string;
   status: AppointmentStatus;
