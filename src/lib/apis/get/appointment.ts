@@ -6,6 +6,7 @@ import type {
 const toAppointment = (document: IAppointmentDocument): IAppointmentPost => ({
   _id: document._id,
   serviceId: document.serviceId,
+  serviceName: document.serviceName,
   customerId: document.customerId,
   appointmentDate: document.appointmentDate,
   timeSlot: document.timeSlot,

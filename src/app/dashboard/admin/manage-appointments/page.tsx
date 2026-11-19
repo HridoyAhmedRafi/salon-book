@@ -1,6 +1,6 @@
-import React from "react";
 
-const ManageAppointments = () => {
+const ManageAppointments = async () => {
+  // const appointments=await 
   return <div>ManageAppointments</div>;
 };
 

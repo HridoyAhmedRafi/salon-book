@@ -108,6 +108,7 @@ const ServiceDetailsPage = async ({ params }: ServiceDetailsPageProps) => {
           <aside className="lg:sticky lg:top-24">
             {service.status === "active" ? (
               <AppointmentForm
+                serviceName={service.serviceName}
                 serviceId={service._id}
                 price={service.price}
                 duration={service.duration}

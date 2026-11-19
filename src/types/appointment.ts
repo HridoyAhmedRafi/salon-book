@@ -4,6 +4,7 @@ export type PaymentStatus = "Unpaid" | "Paid";
 
 export interface IAppointment {
   serviceId: string;
+  serviceName: string;
   customerId: string;
   appointmentDate: string;
   timeSlot: string;
