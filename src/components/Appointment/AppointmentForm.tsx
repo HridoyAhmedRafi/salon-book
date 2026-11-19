@@ -12,6 +12,7 @@ interface ServiceBookingFormProps {
   price: number;
   duration: number;
   serviceName: string;
+  serviceCategory: string;
 }
 
 const timeSlots = [
@@ -33,6 +34,7 @@ const AppointmentForm = ({
   price,
   duration,
   serviceName,
+  serviceCategory,
 }: ServiceBookingFormProps) => {
   const [appointmentDate, setAppointmentDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
@@ -58,6 +60,7 @@ const AppointmentForm = ({
     const bookingData = {
       serviceId,
       serviceName,
+      serviceCategory,
       customerId: user?.id,
       customerName: user?.name,
       customerEmail: user?.email,

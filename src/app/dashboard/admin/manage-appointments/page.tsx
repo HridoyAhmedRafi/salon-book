@@ -1,6 +1,5 @@
-
 const ManageAppointments = async () => {
-  // const appointments=await 
+  // const appointments=await
   return <div>ManageAppointments</div>;
 };
 

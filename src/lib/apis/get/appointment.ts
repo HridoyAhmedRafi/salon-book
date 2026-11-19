@@ -7,6 +7,7 @@ const toAppointment = (document: IAppointmentDocument): IAppointmentPost => ({
   _id: document._id,
   serviceId: document.serviceId,
   serviceName: document.serviceName,
+  serviceCategory: document.serviceCategory,
   customerId: document.customerId,
   appointmentDate: document.appointmentDate,
   timeSlot: document.timeSlot,
