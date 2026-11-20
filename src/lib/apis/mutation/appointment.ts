@@ -8,16 +8,8 @@ export const cancelAppointment = async (
   appointmentId: string,
   customerId: string,
 ) => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/appointments/${appointmentId}/cancel`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ customerId }),
-    },
-  );
+  const api = `${process.env.NEXT_PUBLIC_BASE_URL}/appointments/${appointmentId}/cancel`;
+  const res = await protectedMutation(api, "PATCH", { customerId });
 
   const result = await res.json();
 
