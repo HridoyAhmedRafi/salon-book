@@ -159,7 +159,7 @@ function AppointmentRow({ appointment, servicesById }: AppointmentRowProps) {
           ) : null}
 
           {canPayAppointment(appointment.status, appointment.paymentStatus) ? (
-            <PayAppointmentButton />
+            <PayAppointmentButton appointment={appointment._id} />
           ) : null}
         </div>
       </td>

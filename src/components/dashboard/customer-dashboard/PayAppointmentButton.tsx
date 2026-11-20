@@ -1,20 +1,38 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { createCheckoutSession } from "@/types/payment";
 
-/**
- * Placeholder payment button.
- * The payment provider will be connected later.
- */
-export function PayAppointmentButton() {
-  const handlePay = () => {
-    // TODO: integrate the payment provider.
-    // Intentionally empty until payments are implemented.
+export function PayAppointmentButton({ appointment }: { appointment: string }) {
+  const [loading, setLoading] = useState(false);
+
+  const handlePay = async () => {
+    try {
+      setLoading(true);
+
+      const url = await createCheckoutSession(appointment);
+
+      window.location.href = url;
+    } catch (error) {
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Payment session creation failed.",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Button size="sm" className="h-8 px-3" onClick={handlePay}>
-      Pay now
+    <Button
+      size="sm"
+      className="h-8 px-3"
+      onClick={handlePay}
+      disabled={loading}
+    >
+      {loading ? "Redirecting..." : "Pay now"}
     </Button>
   );
 }
