@@ -1,4 +1,5 @@
 import { IServicePost } from "@/types/service";
+import { getFetch } from "../core/token-apis";
 
 // get service
 export const getServices = async (query = ""): Promise<IServicePost[]> => {
@@ -15,12 +16,8 @@ export const getServices = async (query = ""): Promise<IServicePost[]> => {
 export const getServiceById = async (
   id: string,
 ): Promise<IServicePost | null> => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/services/${id}`,
-    {
-      cache: "no-store",
-    },
-  );
+  const api = `${process.env.NEXT_PUBLIC_BASE_URL}/services/${id}`;
+  const res = await getFetch(api);
   return res.json();
 };
 

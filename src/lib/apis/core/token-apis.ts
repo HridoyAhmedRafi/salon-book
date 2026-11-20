@@ -9,6 +9,27 @@ export const getServerSession = async () => {
   return session;
 };
 
+export const getToken = async () => {
+  const session = await getServerSession();
+  if (!session || !session.session?.token) {
+    redirect("unauthorized");
+  }
+  return session.session.token;
+};
+
+export const getFetch = async (api: string) => {
+  const token = await getToken();
+  const res = await fetch(api, {
+    headers: {
+      authorization: `Bearer ${token}`,
+    },
+  });
+  if (res.status === 401 || res.status === 403) {
+    redirect("/unauthorized");
+  }
+  return res;
+};
+
 export const requiredRole = async (role: string) => {
   const session = await getServerSession();
   if (!session || session?.user?.role !== role) {
