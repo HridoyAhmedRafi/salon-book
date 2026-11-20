@@ -1,8 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { LoaderCircle, Search, SlidersHorizontal, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ const ServiceFilters = ({
 }: ServiceFiltersProps) => {
   const router = useRouter();
   const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
 
   const [search, setSearch] = useState(initialSearch);
   const [category, setCategory] = useState(initialCategory);
@@ -38,9 +39,10 @@ const ServiceFilters = ({
     if (sortValue) params.set("sort", sortValue);
 
     const queryString = params.toString();
+    const url = queryString ? `${pathname}?${queryString}` : pathname;
 
-    router.push(queryString ? `${pathname}?${queryString}` : pathname, {
-      scroll: false,
+    startTransition(() => {
+      router.push(url, { scroll: false });
     });
   };
 
@@ -69,15 +71,30 @@ const ServiceFilters = ({
     setCategory("");
     setSort("");
 
-    router.push(pathname, { scroll: false });
+    startTransition(() => {
+      router.push(pathname, { scroll: false });
+    });
   };
 
   return (
-    <div className="rounded-xl border border-border bg-card p-4 shadow-sm md:p-5">
+    <div
+      aria-busy={isPending}
+      className="rounded-xl border border-border bg-card p-4 shadow-sm md:p-5"
+    >
       <div className="mb-4 flex items-center gap-2">
         <SlidersHorizontal className="size-5 text-[#d2a01f]" />
 
         <h2 className="font-semibold">Search & Filter Services</h2>
+
+        {isPending ? (
+          <span
+            role="status"
+            className="ml-auto inline-flex items-center gap-1.5 text-xs text-muted-foreground"
+          >
+            <LoaderCircle className="size-3.5 animate-spin" />
+            Updating results...
+          </span>
+        ) : null}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_auto]">
@@ -96,15 +113,25 @@ const ServiceFilters = ({
 
           <Button
             type="submit"
-            className="bg-[#d2a01f] text-white hover:bg-[#b88712]"
+            disabled={isPending}
+            aria-busy={isPending}
+            className="gap-2 bg-[#d2a01f] text-white hover:bg-[#b88712]"
           >
-            Search
+            {isPending ? (
+              <>
+                <LoaderCircle className="animate-spin" />
+                Searching...
+              </>
+            ) : (
+              "Search"
+            )}
           </Button>
         </form>
 
         {/* Category */}
         <select
           value={category}
+          disabled={isPending}
           onChange={(e) => handleCategoryChange(e.target.value)}
           className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:border-[#d2a01f] focus-visible:ring-2 focus-visible:ring-[#d2a01f]/20"
         >
@@ -120,6 +147,7 @@ const ServiceFilters = ({
         {/* Sort */}
         <select
           value={sort}
+          disabled={isPending}
           onChange={(e) => handleSortChange(e.target.value)}
           className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:border-[#d2a01f] focus-visible:ring-2 focus-visible:ring-[#d2a01f]/20"
         >
@@ -133,6 +161,7 @@ const ServiceFilters = ({
           type="button"
           variant="outline"
           onClick={handleClearFilters}
+          disabled={isPending}
           className="gap-2"
         >
           <X className="size-4" />
