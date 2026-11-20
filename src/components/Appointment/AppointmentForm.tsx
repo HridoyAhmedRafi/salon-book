@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarDays, Clock3, MessageSquare } from "lucide-react";
+import { CalendarDays, Clock3, LoaderCircle, MessageSquare } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -39,6 +39,7 @@ const AppointmentForm = ({
   const [appointmentDate, setAppointmentDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
   const [message, setMessage] = useState("");
+  const [requesting, setRequesting] = useState(false);
   const router = useRouter();
 
   const { data: session, isPending } = authClient.useSession();
@@ -53,7 +54,13 @@ const AppointmentForm = ({
 
   const handleBooking = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (requesting) {
+      return;
+    }
+
     if (!user?.id) {
+      toast.error("Please sign in to request an appointment.");
       router.push("/sign-in");
       return;
     }
@@ -62,15 +69,17 @@ const AppointmentForm = ({
       serviceId,
       serviceName,
       serviceCategory,
-      customerId: user?.id,
-      customerName: user?.name,
-      customerEmail: user?.email,
-      customerImage: user?.image,
+      customerId: user.id,
+      customerName: user.name,
+      customerEmail: user.email,
+      customerImage: user.image,
       appointmentDate,
       timeSlot,
       message,
       price,
     };
+
+    setRequesting(true);
 
     try {
       const result = await BookAppointment(bookingData);
@@ -78,13 +87,18 @@ const AppointmentForm = ({
       if (result.acknowledged === true) {
         toast.success("Appointment booked successfully!");
         router.push("/services");
+        return;
       }
+
+      toast.error("Could not send your appointment request. Please try again.");
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error(error.message);
       } else {
         toast.error("Something went wrong!");
       }
+    } finally {
+      setRequesting(false);
     }
   };
 
@@ -134,6 +148,7 @@ const AppointmentForm = ({
             type="date"
             min={minDate}
             value={appointmentDate}
+            disabled={requesting}
             onChange={(e) => {
               setAppointmentDate(e.target.value);
               setTimeSlot("");
@@ -155,7 +170,7 @@ const AppointmentForm = ({
               <button
                 key={slot}
                 type="button"
-                disabled={!appointmentDate}
+                disabled={!appointmentDate || requesting}
                 onClick={() => setTimeSlot(slot)}
                 className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
                   timeSlot === slot
@@ -192,6 +207,7 @@ const AppointmentForm = ({
             id="message"
             rows={3}
             value={message}
+            disabled={requesting}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Any special requests?"
             className="w-full resize-none rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-[#d2a01f] focus:ring-2 focus:ring-[#d2a01f]/20"
@@ -201,10 +217,18 @@ const AppointmentForm = ({
         {/* Submit Button */}
         <button
           type="submit"
-          disabled={!appointmentDate || !timeSlot}
-          className="cursor-pointer w-full rounded-lg bg-[#d2a01f] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#b88712] disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={!appointmentDate || !timeSlot || requesting || isPending}
+          aria-busy={requesting}
+          className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#d2a01f] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#b88712] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Request Appointment
+          {requesting ? (
+            <>
+              <LoaderCircle className="size-4 animate-spin" />
+              Requesting...
+            </>
+          ) : (
+            "Request Appointment"
+          )}
         </button>
       </form>
     </div>

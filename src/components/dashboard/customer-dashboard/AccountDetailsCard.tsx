@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 
 import { StatusBadge } from "@/components/dashboard/shared/StatusBadge";
+import { SignOutButton } from "@/components/dashboard/shared/SignOutButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -62,6 +63,21 @@ export function AccountDetailsCard({ user }: { user: IProfileUser }) {
           Role and account status can only be changed by the salon. Contact us
           if something looks wrong.
         </p>
+
+        <Separator />
+
+        <div className="space-y-2">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+            Session
+          </p>
+
+          <p className="text-xs leading-5 text-muted-foreground">
+            Signing out ends this session on this device. You can sign back in
+            at any time.
+          </p>
+
+          <SignOutButton />
+        </div>
       </CardContent>
     </Card>
   );

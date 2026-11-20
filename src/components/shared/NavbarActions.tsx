@@ -1,10 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { LayoutDashboard, LogOut, Menu, UserRound } from "lucide-react";
-import { toast } from "sonner";
 
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { navLinks } from "@/components/shared/nav-links";
@@ -17,39 +14,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { authClient } from "@/lib/auth-client";
+import { useSignOut } from "@/hooks/use-sign-out";
 import { NavbarActionsProps } from "@/types/navbar";
 
 const itemClass =
   "cursor-pointer gap-2 px-2 py-1.5 hover:bg-primary/10 focus:bg-primary/10 focus:text-foreground dark:hover:bg-primary/10";
 
 export default function NavbarActions({ user }: NavbarActionsProps) {
-  const router = useRouter();
-  const [signingOut, setSigningOut] = useState(false);
+  const { signOut, signingOut } = useSignOut();
 
   const initial = user?.name.trim().charAt(0).toUpperCase() || "U";
 
   const dashboardLink = user ? `/dashboard/${user.role}` : "/dashboard";
   const profileLink = `/dashboard/${user?.role}/profile`;
-
-  const handleSignOut = async () => {
-    if (signingOut) return;
-
-    setSigningOut(true);
-
-    const { error } = await authClient.signOut();
-
-    setSigningOut(false);
-
-    if (error) {
-      toast.error(error.message ?? "Could not sign you out.");
-      return;
-    }
-
-    toast.success("Signed out. See you soon!");
-    router.push("/");
-    router.refresh();
-  };
 
   return (
     <div className="flex items-center gap-2">
@@ -131,7 +108,7 @@ export default function NavbarActions({ user }: NavbarActionsProps) {
 
               <DropdownMenuItem
                 variant="destructive"
-                onClick={handleSignOut}
+                onClick={signOut}
                 disabled={signingOut}
                 className="cursor-pointer gap-2 px-2 py-1.5"
               >
@@ -220,7 +197,7 @@ export default function NavbarActions({ user }: NavbarActionsProps) {
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
-                  render={<Link href="/my-profile" />}
+                  render={<Link href={profileLink} />}
                   className={itemClass}
                 >
                   <UserRound />
@@ -231,7 +208,7 @@ export default function NavbarActions({ user }: NavbarActionsProps) {
 
                 <DropdownMenuItem
                   variant="destructive"
-                  onClick={handleSignOut}
+                  onClick={signOut}
                   disabled={signingOut}
                   className="cursor-pointer gap-2 px-2 py-1.5"
                 >

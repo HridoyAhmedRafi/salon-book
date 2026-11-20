@@ -1,9 +1,14 @@
+import { Suspense } from "react";
+import { CircleAlert } from "lucide-react";
+
 import ServiceCard from "@/components/browse-services/ServiceCard";
 import ServiceFilters from "@/components/browse-services/ServiceFilters";
+import { ServiceResultsSkeleton } from "@/components/browse-services/ServiceGridSkeleton";
 import Footer from "@/components/shared/Footer";
 import { Navbar } from "@/components/shared/Navbar";
-
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getServices } from "@/lib/apis/get/services";
+import type { IServicePost } from "@/types/service";
 
 interface BrowseServicesProps {
   searchParams: Promise<{
@@ -27,8 +32,7 @@ const BrowseServices = async ({ searchParams }: BrowseServicesProps) => {
   if (categoryValue) query.set("category", categoryValue);
   if (sortValue) query.set("sort", sortValue);
 
-  // Fetch services from backend
-  const services = await getServices(query.toString());
+  const queryString = query.toString();
 
   return (
     <div className="min-h-screen bg-background">
@@ -58,43 +62,80 @@ const BrowseServices = async ({ searchParams }: BrowseServicesProps) => {
           initialSort={sortValue}
         />
 
-        {/* Results Header */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
-          <div>
-            <h2 className="text-xl font-semibold">Available Services</h2>
-
-            <p className="mt-1 text-sm text-muted-foreground">
-              Find the right service for you.
-            </p>
-          </div>
-
-          <p className="text-sm text-muted-foreground">
-            {services.length} {services.length === 1 ? "service" : "services"}{" "}
-            found
-          </p>
-        </div>
-
-        {/* Service Cards */}
-        {services.length > 0 ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {services.map((service) => (
-              <ServiceCard key={service._id} service={service} />
-            ))}
-          </div>
-        ) : (
-          <div className="flex min-h-72 flex-col items-center justify-center rounded-xl border border-dashed border-border px-5 text-center">
-            <h3 className="text-xl font-semibold">No Services Found</h3>
-
-            <p className="mt-2 max-w-md text-sm text-muted-foreground">
-              We couldn&apos;t find any services matching your search. Try
-              changing your search or filters.
-            </p>
-          </div>
-        )}
+        {/* Results */}
+        <Suspense key={queryString} fallback={<ServiceResultsSkeleton />}>
+          <ServiceResults queryString={queryString} />
+        </Suspense>
       </main>
       <Footer />
     </div>
   );
 };
+
+async function ServiceResults({ queryString }: { queryString: string }) {
+  let services: IServicePost[] = [];
+  let loadFailed = false;
+
+  try {
+    const result = await getServices(queryString);
+
+    if (Array.isArray(result)) {
+      services = result;
+    }
+  } catch {
+    loadFailed = true;
+  }
+
+  if (loadFailed) {
+    return (
+      <Alert variant="destructive">
+        <CircleAlert />
+        <AlertTitle>Could not load services</AlertTitle>
+        <AlertDescription>
+          Refresh the page to try again. If the problem continues, check that
+          the backend API is running.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  return (
+    <>
+      {/* Results Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
+        <div>
+          <h2 className="text-xl font-semibold">Available Services</h2>
+
+          <p className="mt-1 text-sm text-muted-foreground">
+            Find the right service for you.
+          </p>
+        </div>
+
+        <p className="text-sm text-muted-foreground">
+          {services.length} {services.length === 1 ? "service" : "services"}{" "}
+          found
+        </p>
+      </div>
+
+      {/* Service Cards */}
+      {services.length > 0 ? (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {services.map((service) => (
+            <ServiceCard key={service._id} service={service} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex min-h-72 flex-col items-center justify-center rounded-xl border border-dashed border-border px-5 text-center">
+          <h3 className="text-xl font-semibold">No Services Found</h3>
+
+          <p className="mt-2 max-w-md text-sm text-muted-foreground">
+            We couldn&apos;t find any services matching your search. Try
+            changing your search or filters.
+          </p>
+        </div>
+      )}
+    </>
+  );
+}
 
 export default BrowseServices;

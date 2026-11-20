@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { CalendarPlus, CircleAlert } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -5,6 +6,7 @@ import { redirect } from "next/navigation";
 
 import { CustomerAppointmentOverview } from "@/components/dashboard/customer-dashboard/CustomerAppointmentOverview";
 import { DashboardPageHeader } from "@/components/dashboard/shared/DashboardPageHeader";
+import { DashboardStatsSkeleton } from "@/components/dashboard/shared/DashboardSkeletons";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { getAppointmentByUserId } from "@/lib/apis/get/appointment";
@@ -17,15 +19,6 @@ const CustomerDashboard = async () => {
 
   if (!user?.id) {
     redirect("/sign-in");
-  }
-
-  let appointments: IAppointmentPost[] = [];
-  let loadFailed = false;
-
-  try {
-    appointments = await getAppointmentByUserId(user.id);
-  } catch {
-    loadFailed = true;
   }
 
   return (
@@ -46,6 +39,25 @@ const CustomerDashboard = async () => {
         }
       />
 
+      <Suspense fallback={<DashboardStatsSkeleton count={4} columns={4} />}>
+        <CustomerAppointmentStats userId={user.id} />
+      </Suspense>
+    </div>
+  );
+};
+
+async function CustomerAppointmentStats({ userId }: { userId: string }) {
+  let appointments: IAppointmentPost[] = [];
+  let loadFailed = false;
+
+  try {
+    appointments = await getAppointmentByUserId(userId);
+  } catch {
+    loadFailed = true;
+  }
+
+  return (
+    <div className="space-y-8">
       {loadFailed ? (
         <Alert variant="destructive">
           <CircleAlert />
@@ -60,6 +72,6 @@ const CustomerDashboard = async () => {
       <CustomerAppointmentOverview appointments={appointments} />
     </div>
   );
-};
+}
 
 export default CustomerDashboard;
