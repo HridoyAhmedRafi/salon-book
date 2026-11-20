@@ -2,9 +2,10 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { LoaderCircle, Mail, Trash2 } from "lucide-react";
+import { LoaderCircle, Mail } from "lucide-react";
 import { toast } from "sonner";
 
+import { ImageUploadField } from "@/components/shared/ImageUploadField";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,26 +29,6 @@ function getInitial(name: string) {
   return name.trim().charAt(0).toUpperCase() || "U";
 }
 
-function validateImageUrl(value: string) {
-  const trimmed = value.trim();
-
-  if (!trimmed) {
-    return "";
-  }
-
-  try {
-    const url = new URL(trimmed);
-
-    if (url.protocol !== "http:" && url.protocol !== "https:") {
-      return "Use an http or https image link.";
-    }
-
-    return "";
-  } catch {
-    return "Enter a valid image URL.";
-  }
-}
-
 /**
  * Editable customer details. Name and image are persisted through Better Auth;
  * email is read-only because it is managed by the salon.
@@ -58,7 +39,7 @@ export function CustomerProfileForm({ user }: CustomerProfileFormProps) {
   const [name, setName] = useState(user.name);
   const [image, setImage] = useState(user.image ?? "");
   const [nameError, setNameError] = useState("");
-  const [imageError, setImageError] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const trimmedName = name.trim();
@@ -71,17 +52,19 @@ export function CustomerProfileForm({ user }: CustomerProfileFormProps) {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (submitting) {
+    if (submitting || uploadingImage) {
+      if (uploadingImage) {
+        toast.error("Please wait for the photo upload to finish.");
+      }
+
       return;
     }
 
     const nextNameError = trimmedName ? "" : "Name is required.";
-    const nextImageError = validateImageUrl(trimmedImage);
 
     setNameError(nextNameError);
-    setImageError(nextImageError);
 
-    if (nextNameError || nextImageError) {
+    if (nextNameError) {
       return;
     }
 
@@ -134,50 +117,15 @@ export function CustomerProfileForm({ user }: CustomerProfileFormProps) {
             </Avatar>
 
             <div className="flex-1 space-y-2">
-              <Label htmlFor="image">Profile image URL</Label>
-
-              <Input
-                id="image"
-                name="image"
-                type="url"
-                inputMode="url"
-                placeholder="https://example.com/photo.jpg"
+              <ImageUploadField
                 value={image}
-                onChange={(event) => {
-                  setImage(event.target.value);
-
-                  if (imageError) {
-                    setImageError("");
-                  }
-                }}
-                aria-invalid={Boolean(imageError)}
-                className="h-10"
+                onChange={setImage}
+                onUploadingChange={setUploadingImage}
+                label="Profile photo"
+                description="PNG, JPEG, WebP or GIF · up to 5 MB. Leave empty to use your initial."
+                showPreview={false}
+                disabled={submitting}
               />
-
-              {imageError ? (
-                <p className="text-xs text-destructive">{imageError}</p>
-              ) : null}
-
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-xs text-muted-foreground">
-                  JPEG, PNG, or WebP link. Leave blank to use your initial.
-                </p>
-
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setImage("");
-                    setImageError("");
-                  }}
-                  disabled={!trimmedImage}
-                  className="cursor-pointer text-muted-foreground hover:text-destructive"
-                >
-                  <Trash2 />
-                  Remove photo
-                </Button>
-              </div>
             </div>
           </div>
 
@@ -236,7 +184,7 @@ export function CustomerProfileForm({ user }: CustomerProfileFormProps) {
 
           <Button
             type="submit"
-            disabled={!hasChanges || submitting}
+            disabled={!hasChanges || submitting || uploadingImage}
             aria-busy={submitting}
             className="min-w-32 cursor-pointer"
           >

@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import {
   Eye,
   EyeOff,
-  Image as ImageIcon,
   LoaderCircle,
   Lock,
   Mail,
@@ -15,6 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+import { ImageUploadField } from "@/components/shared/ImageUploadField";
 import { signIn, signUp } from "@/lib/auth-client";
 
 const inputClass =
@@ -25,6 +25,8 @@ const SignUpPage = () => {
 
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [image, setImage] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const isPasswordValid =
@@ -32,7 +34,14 @@ const SignUpPage = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (submitting) return;
+
+    if (submitting || uploadingImage) {
+      if (uploadingImage) {
+        toast.error("Please wait for the photo upload to finish.");
+      }
+
+      return;
+    }
 
     if (!isPasswordValid) {
       toast.error(
@@ -44,7 +53,7 @@ const SignUpPage = () => {
     const formData = new FormData(event.currentTarget);
     const name = String(formData.get("name") ?? "").trim();
     const email = String(formData.get("email") ?? "").trim();
-    const image = String(formData.get("image") ?? "").trim();
+    const trimmedImage = image.trim();
 
     setSubmitting(true);
 
@@ -53,7 +62,7 @@ const SignUpPage = () => {
         name,
         email,
         password,
-        image: image || undefined,
+        image: trimmedImage || undefined,
       });
 
       if (error) {
@@ -140,23 +149,15 @@ const SignUpPage = () => {
           </div>
 
           <div>
-            <label
-              htmlFor="image"
-              className="mb-1 block text-sm font-medium text-foreground"
-            >
-              Photo URL
-            </label>
-            <div className="relative">
-              <ImageIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                id="image"
-                name="image"
-                type="url"
-                autoComplete="url"
-                placeholder="https://example.com/photo.jpg"
-                className={inputClass}
-              />
-            </div>
+            <ImageUploadField
+              value={image}
+              onChange={setImage}
+              onUploadingChange={setUploadingImage}
+              label="Profile photo (optional)"
+              description="PNG, JPEG, WebP or GIF · up to 5 MB."
+              showPreview={false}
+              disabled={submitting}
+            />
           </div>
 
           <div>
@@ -202,7 +203,7 @@ const SignUpPage = () => {
 
           <button
             type="submit"
-            disabled={!isPasswordValid || submitting}
+            disabled={!isPasswordValid || submitting || uploadingImage}
             aria-busy={submitting}
             className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
