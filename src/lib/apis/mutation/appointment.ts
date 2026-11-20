@@ -1,4 +1,7 @@
+"use server";
+
 import { IAppointment } from "@/types/appointment";
+import { protectedMutation } from "../core/token-apis";
 
 // cancel a pending appointment
 export const cancelAppointment = async (
@@ -27,16 +30,8 @@ export const cancelAppointment = async (
 
 // book appointment
 export const BookAppointment = async (data: IAppointment) => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/book-appointment`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    },
-  );
+  const api = `${process.env.NEXT_PUBLIC_BASE_URL}/book-appointment`;
+  const res = await protectedMutation(api, "POST", data);
   const result = await res.json();
   if (!res.ok) {
     throw new Error(result.message);

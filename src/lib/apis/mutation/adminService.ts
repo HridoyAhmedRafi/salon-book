@@ -1,4 +1,7 @@
+"use server";
+
 import type { IService, ServiceStatus } from "@/types/service";
+import { protectedMutation } from "../core/token-apis";
 
 const getErrorMessage = async (res: Response, fallback: string) => {
   try {
@@ -11,16 +14,8 @@ const getErrorMessage = async (res: Response, fallback: string) => {
 };
 
 export const updateService = async (id: string, data: IService) => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/services/${id}`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    },
-  );
+  const api = `${process.env.NEXT_PUBLIC_BASE_URL}/services/${id}`;
+  const res = await protectedMutation(api, "PATCH", data);
 
   if (!res.ok) {
     throw new Error(
@@ -35,16 +30,8 @@ export const updateServiceStatus = async (
   id: string,
   status: ServiceStatus,
 ) => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/services/${id}/status`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ status }),
-    },
-  );
+  const api = `${process.env.NEXT_PUBLIC_BASE_URL}/services/${id}/status`;
+  const res = await protectedMutation(api, "PATCH", { status });
 
   if (!res.ok) {
     throw new Error(
@@ -56,12 +43,8 @@ export const updateServiceStatus = async (
 };
 
 export const deleteService = async (id: string) => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/services/${id}`,
-    {
-      method: "DELETE",
-    },
-  );
+  const api = `${process.env.NEXT_PUBLIC_BASE_URL}/services/${id}`;
+  const res = await protectedMutation(api, "DELETE");
 
   if (!res.ok) {
     throw new Error(

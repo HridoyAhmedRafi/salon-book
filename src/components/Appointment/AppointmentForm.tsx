@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarDays, Clock3, LoaderCircle, MessageSquare } from "lucide-react";
+import {
+  CalendarDays,
+  Clock3,
+  LoaderCircle,
+  MessageSquare,
+} from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -62,6 +67,10 @@ const AppointmentForm = ({
     if (!user?.id) {
       toast.error("Please sign in to request an appointment.");
       router.push("/sign-in");
+      return;
+    }
+    if (user.role !== "customer") {
+      toast.message("Only customer can request an appointment.");
       return;
     }
 

@@ -3,6 +3,7 @@ import type {
   IAppointmentDocument,
   IAppointmentPost,
 } from "@/types/appointment";
+import { getFetch } from "../core/token-apis";
 
 const toAppointment = (document: IAppointmentDocument): IAppointmentPost => ({
   _id: document._id,
@@ -49,12 +50,8 @@ export const getAppointmentByUserId = async (
 
 /** Loads every appointment request for the admin dashboard. */
 export const getAllAppointments = async (): Promise<IAdminAppointment[]> => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/admin/appointments`,
-    {
-      cache: "no-store",
-    },
-  );
+  const api = `${process.env.NEXT_PUBLIC_BASE_URL}/admin/appointments`;
+  const res = await getFetch(api);
 
   if (!res.ok) {
     throw new Error(`Failed to load appointments (${res.status})`);
