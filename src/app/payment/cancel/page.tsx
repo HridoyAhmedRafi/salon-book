@@ -16,17 +16,20 @@ const PaymentCancelPage = () => {
       <Card className="w-full max-w-md text-center shadow-lg">
         <CardHeader className="flex flex-col items-center">
           <XCircle className="size-14 text-amber-500 mb-3" />
-          <CardTitle className="text-2xl font-bold">Payment Cancelled</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            Payment Cancelled
+          </CardTitle>
           <CardDescription className="text-sm">
-            Your checkout session was cancelled. No charges were made to your account.
+            Your checkout session was cancelled. No charges were made to your
+            account.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
             Your appointment is still reserved and marked as{" "}
-            <span className="font-semibold text-foreground">Unpaid</span>. You can
-            return to your appointments dashboard whenever you are ready to complete
-            payment.
+            <span className="font-semibold text-foreground">Unpaid</span>. You
+            can return to your appointments dashboard whenever you are ready to
+            complete payment.
           </p>
         </CardContent>
         <CardFooter className="flex flex-col gap-2 sm:flex-row justify-center">
