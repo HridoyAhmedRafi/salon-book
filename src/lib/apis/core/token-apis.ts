@@ -12,7 +12,7 @@ export const getServerSession = async () => {
 export const getToken = async () => {
   const session = await getServerSession();
   if (!session || !session.session?.token) {
-    redirect("unauthorized");
+    redirect("/unauthorized");
   }
   return session.session.token;
 };
