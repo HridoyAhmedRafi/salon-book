@@ -1,16 +1,71 @@
+// import { NextResponse } from "next/server";
+// import type { NextRequest } from "next/server";
+// import { auth } from "./lib/auth";
+// import { headers } from "next/headers";
+
+// export async function proxy(request: NextRequest) {
+//   const session = await auth.api.getSession({
+//     headers: await headers(),
+//   });
+
+//   const user = session?.user;
+//   const isBlocked = session?.user?.isBlocked;
+//   const pathname = request.nextUrl.pathname;
+
+//   if (!user) {
+//     return NextResponse.redirect(new URL("/sign-in", request.url));
+//   }
+
+//   if (
+//     isBlocked &&
+//     pathname !== `/dashboard/${user.role}/profile` &&
+//     pathname !== "/services"
+//   ) {
+//     return NextResponse.redirect(new URL("/blocked", request.url));
+//   }
+
+//   return NextResponse.next();
+// }
+
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { auth } from "./lib/auth";
-import { headers } from "next/headers";
+import { getSessionCookie } from "better-auth/cookies";
+
+type SessionResponse = {
+  user?: {
+    role?: string;
+    isBlocked?: boolean;
+  };
+} | null;
 
 export async function proxy(request: NextRequest) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const pathname = request.nextUrl.pathname;
+
+  // 1. Cookie na thakle kono API/DB call charai direct /sign-in e pathabe
+  const sessionCookie = getSessionCookie(request);
+  if (!sessionCookie) {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
+  }
+
+  // 2. Direct auth.api.getSession() er bodole API route theke session fetch
+  let session: SessionResponse = null;
+  try {
+    const res = await fetch(new URL("/api/auth/get-session", request.url), {
+      headers: {
+        cookie: request.headers.get("cookie") || "",
+      },
+      cache: "no-store",
+    });
+
+    if (res.ok) {
+      session = await res.json();
+    }
+  } catch {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
+  }
 
   const user = session?.user;
-  const isBlocked = session?.user?.isBlocked;
-  const pathname = request.nextUrl.pathname;
+  const isBlocked = user?.isBlocked;
 
   if (!user) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
