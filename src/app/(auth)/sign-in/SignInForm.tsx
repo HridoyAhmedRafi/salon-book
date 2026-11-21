@@ -87,7 +87,6 @@ const SignInForm = () => {
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: "/",
       });
     } catch {
       toast.error("Could not start Google sign in. Please try again.");
