@@ -9,13 +9,20 @@ import { getAppointmentByUserId } from "@/lib/apis/get/appointment";
 import { getServices } from "@/lib/apis/get/services";
 import type { IAppointmentPost } from "@/types/appointment";
 import type { IServicePost } from "@/types/service";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 const MyAppointments = async () => {
+  const session = await auth.api.getSession({
+    headers: await headers(), // you need to pass the headers object.
+  });
+  const user = session?.user;
+
   let appointments: IAppointmentPost[] = [];
   let loadFailed = false;
 
   try {
-    appointments = await getAppointmentByUserId();
+    appointments = await getAppointmentByUserId(user?.id as string);
   } catch {
     loadFailed = true;
   }

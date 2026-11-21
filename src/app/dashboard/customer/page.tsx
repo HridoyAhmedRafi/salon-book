@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import { CalendarPlus, CircleAlert } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 import { CustomerAppointmentOverview } from "@/components/dashboard/customer-dashboard/CustomerAppointmentOverview";
 import { DashboardPageHeader } from "@/components/dashboard/shared/DashboardPageHeader";
@@ -41,18 +40,18 @@ const CustomerDashboard = async () => {
       />
 
       <Suspense fallback={<DashboardStatsSkeleton count={4} columns={4} />}>
-        <CustomerAppointmentStats userId={user?.id as string} />
+        <CustomerAppointmentStats userId={user?.id} />
       </Suspense>
     </div>
   );
 };
 
-async function CustomerAppointmentStats({ userId }: { userId: string }) {
+async function CustomerAppointmentStats({ userId }: { userId?: string }) {
   let appointments: IAppointmentPost[] = [];
   let loadFailed = false;
 
   try {
-    appointments = await getAppointmentByUserId(userId);
+    appointments = await getAppointmentByUserId(userId as string);
   } catch {
     loadFailed = true;
   }

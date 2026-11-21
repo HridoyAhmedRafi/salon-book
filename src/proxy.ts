@@ -32,7 +32,6 @@ dns.setServers(["8.8.8.8", "8.8.4.4"]);
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
-import { auth } from "./lib/auth";
 
 type SessionResponse = {
   user?: {
@@ -44,44 +43,34 @@ type SessionResponse = {
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  const redirectToSignIn = () => {
-    const signInUrl = new URL("/sign-in", request.url);
-    signInUrl.searchParams.set(
-      "redirect",
-      `${pathname}${request.nextUrl.search}`,
-    );
-    return NextResponse.redirect(signInUrl);
-  };
-
   // 1. Cookie na thakle kono API/DB call charai direct /sign-in e pathabe
   const sessionCookie = getSessionCookie(request);
   if (!sessionCookie) {
-    return redirectToSignIn();
+    return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
   // 2. Direct auth.api.getSession() er bodole API route theke session fetch
-  let session = null;
+  let session: SessionResponse = null;
   try {
-    // const res = await fetch(new URL("/api/auth/get-session", request.url), {
-    //   headers: {
-    //     cookie: request.headers.get("cookie") || "",
-    //   },
-    //   cache: "no-store",
-    // });
+    const res = await fetch(new URL("/api/auth/get-session", request.url), {
+      headers: {
+        cookie: request.headers.get("cookie") || "",
+      },
+      cache: "no-store",
+    });
 
-    // if (res.ok) {
-    //   session = await res.json();
-    // }
-    session = await auth.api.getSession({ headers: request.headers });
+    if (res.ok) {
+      session = await res.json();
+    }
   } catch {
-    return redirectToSignIn();
+    return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
   const user = session?.user;
   const isBlocked = user?.isBlocked;
 
   if (!user) {
-    return redirectToSignIn();
+    return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
   if (

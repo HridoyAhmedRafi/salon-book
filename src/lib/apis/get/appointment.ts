@@ -30,8 +30,10 @@ const toAdminAppointment = (
   customerImage: document.customerImage,
 });
 
-export const getAppointmentByUserId = async (): Promise<IAppointmentPost[]> => {
-  const api = `${process.env.NEXT_PUBLIC_BASE_URL}/appointments`;
+export const getAppointmentByUserId = async (
+  id: string,
+): Promise<IAppointmentPost[]> => {
+  const api = `${process.env.NEXT_PUBLIC_BASE_URL}/appointments/${id}`;
   const res = await getFetch(api);
 
   if (!res.ok) {
