@@ -1,8 +1,5 @@
 import { CalendarPlus, CircleAlert } from "lucide-react";
-import { headers } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-
 import { MyAppointmentsTable } from "@/components/dashboard/customer-dashboard/MyAppointmentsTable";
 import { DashboardPageHeader } from "@/components/dashboard/shared/DashboardPageHeader";
 import { RetryButton } from "@/components/shared/RetryButton";
@@ -10,23 +7,15 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { getAppointmentByUserId } from "@/lib/apis/get/appointment";
 import { getServices } from "@/lib/apis/get/services";
-import { auth } from "@/lib/auth";
 import type { IAppointmentPost } from "@/types/appointment";
 import type { IServicePost } from "@/types/service";
 
 const MyAppointments = async () => {
-  const session = await auth.api.getSession({ headers: await headers() });
-  const user = session?.user;
-
-  // if (!user?.id) {
-  //   redirect("/sign-in");
-  // }
-
   let appointments: IAppointmentPost[] = [];
   let loadFailed = false;
 
   try {
-    appointments = await getAppointmentByUserId(user?.id as string);
+    appointments = await getAppointmentByUserId();
   } catch {
     loadFailed = true;
   }
