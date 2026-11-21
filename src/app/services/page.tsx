@@ -6,6 +6,7 @@ import ServiceFilters from "@/components/browse-services/ServiceFilters";
 import { ServiceResultsSkeleton } from "@/components/browse-services/ServiceGridSkeleton";
 import Footer from "@/components/shared/Footer";
 import { Navbar } from "@/components/shared/Navbar";
+import { RetryButton } from "@/components/shared/RetryButton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getServices } from "@/lib/apis/get/services";
 import type { IServicePost } from "@/types/service";
@@ -92,8 +93,11 @@ async function ServiceResults({ queryString }: { queryString: string }) {
         <CircleAlert />
         <AlertTitle>Could not load services</AlertTitle>
         <AlertDescription>
-          Refresh the page to try again. If the problem continues, check that
-          the backend API is running.
+          <p>
+            Something went wrong while fetching the service list. Try again, and
+            if the problem continues, check that the backend API is running.
+          </p>
+          <RetryButton className="mt-3" />
         </AlertDescription>
       </Alert>
     );

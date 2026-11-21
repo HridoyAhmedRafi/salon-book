@@ -2,6 +2,7 @@ import { CircleAlert } from "lucide-react";
 
 import { AdminTransactionsTable } from "@/components/dashboard/admin-transactions/AdminTransactionsTable";
 import { DashboardPageHeader } from "@/components/dashboard/shared/DashboardPageHeader";
+import { RetryButton } from "@/components/shared/RetryButton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getAdminTransactions } from "@/lib/apis/get/AdminTransactions";
 import type { IAdminTransaction } from "@/types/admin-transaction";
@@ -29,8 +30,12 @@ const ManageTransactions = async () => {
           <CircleAlert />
           <AlertTitle>Could not load transactions</AlertTitle>
           <AlertDescription>
-            Refresh the page to try again. If the problem continues, check that
-            the backend API is running.
+            <p>
+              Something went wrong while fetching the payment history. Try
+              again, and if the problem continues, check that the backend API is
+              running.
+            </p>
+            <RetryButton className="mt-3" />
           </AlertDescription>
         </Alert>
       ) : (

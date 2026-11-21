@@ -14,6 +14,7 @@ import {
 import { DashboardPageHeader } from "@/components/dashboard/shared/DashboardPageHeader";
 import { DashboardStatsSkeleton } from "@/components/dashboard/shared/DashboardSkeletons";
 import { StatCard } from "@/components/dashboard/shared/StatCard";
+import { RetryButton } from "@/components/shared/RetryButton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { GetDashboardStats } from "@/lib/apis/get/GetDashboardStats";
@@ -73,8 +74,11 @@ async function AdminStats() {
         <CircleAlert />
         <AlertTitle>Could not load dashboard statistics</AlertTitle>
         <AlertDescription>
-          Refresh the page to try again. If the problem continues, check that
-          the backend API is running.
+          <p>
+            Something went wrong while fetching the overview. Try again, and if
+            the problem continues, check that the backend API is running.
+          </p>
+          <RetryButton className="mt-3" />
         </AlertDescription>
       </Alert>
     );

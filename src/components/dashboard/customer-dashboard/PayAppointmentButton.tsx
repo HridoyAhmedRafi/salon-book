@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { LoaderCircle } from "lucide-react";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { createCheckoutSession } from "@/types/payment";
 
@@ -8,18 +11,23 @@ export function PayAppointmentButton({ appointment }: { appointment: string }) {
   const [loading, setLoading] = useState(false);
 
   const handlePay = async () => {
+    if (loading) {
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      setLoading(true);
+      const result = await createCheckoutSession(appointment);
 
-      const url = await createCheckoutSession(appointment);
+      if (!result.ok) {
+        toast.error(result.message);
+        return;
+      }
 
-      window.location.href = url;
-    } catch (error) {
-      alert(
-        error instanceof Error
-          ? error.message
-          : "Payment session creation failed.",
-      );
+      window.location.assign(result.data);
+    } catch {
+      toast.error("Could not start checkout. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -31,7 +39,9 @@ export function PayAppointmentButton({ appointment }: { appointment: string }) {
       className="h-8 px-3"
       onClick={handlePay}
       disabled={loading}
+      aria-busy={loading}
     >
+      {loading ? <LoaderCircle className="animate-spin" /> : null}
       {loading ? "Redirecting..." : "Pay now"}
     </Button>
   );

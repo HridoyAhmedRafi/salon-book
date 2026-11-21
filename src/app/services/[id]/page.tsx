@@ -1,11 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Clock3, Tag, CalendarDays } from "lucide-react";
+import {
+  ArrowLeft,
+  CircleAlert,
+  Clock3,
+  Tag,
+  CalendarDays,
+} from "lucide-react";
 import AppointmentForm from "@/components/Appointment/AppointmentForm";
+import { RetryButton } from "@/components/shared/RetryButton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { buttonVariants } from "@/components/ui/button";
 import { getServiceById } from "@/lib/apis/get/services";
 import Footer from "@/components/shared/Footer";
 import { Navbar } from "@/components/shared/Navbar";
+import type { IServicePost } from "@/types/service";
 
 interface ServiceDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -14,7 +24,47 @@ interface ServiceDetailsPageProps {
 const ServiceDetailsPage = async ({ params }: ServiceDetailsPageProps) => {
   const { id } = await params;
 
-  const service = await getServiceById(id);
+  let service: IServicePost | null = null;
+  let loadFailed = false;
+
+  try {
+    service = await getServiceById(id);
+  } catch {
+    loadFailed = true;
+  }
+
+  if (loadFailed) {
+    return (
+      <main className="min-h-screen bg-background">
+        <Navbar />
+
+        <div className="mx-auto max-w-3xl space-y-6 px-4 py-16">
+          <Alert variant="destructive">
+            <CircleAlert />
+            <AlertTitle>Could not load this service</AlertTitle>
+            <AlertDescription>
+              <p>
+                The service details could not be fetched. Check your connection
+                and try again.
+              </p>
+              <RetryButton className="mt-3" />
+            </AlertDescription>
+          </Alert>
+
+          <Link
+            href="/services"
+            className={buttonVariants({ variant: "outline" })}
+          >
+            <ArrowLeft />
+            Back to services
+          </Link>
+        </div>
+
+        <Footer />
+      </main>
+    );
+  }
+
   if (!service) {
     notFound();
   }
@@ -36,14 +86,20 @@ const ServiceDetailsPage = async ({ params }: ServiceDetailsPageProps) => {
           <section className="min-w-0 space-y-7">
             {/* Service Image */}
             <div className="relative aspect-video overflow-hidden rounded-2xl bg-muted">
-              <Image
-                src={service.image}
-                alt={service.serviceName}
-                fill
-                unoptimized
-                priority
-                className="object-cover"
-              />
+              {service.image ? (
+                <Image
+                  src={service.image}
+                  alt={service.serviceName}
+                  fill
+                  unoptimized
+                  priority
+                  className="object-cover"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                  No image available
+                </div>
+              )}
             </div>
 
             {/* Service Information */}

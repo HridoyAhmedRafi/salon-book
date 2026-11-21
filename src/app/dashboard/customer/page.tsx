@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { CustomerAppointmentOverview } from "@/components/dashboard/customer-dashboard/CustomerAppointmentOverview";
 import { DashboardPageHeader } from "@/components/dashboard/shared/DashboardPageHeader";
 import { DashboardStatsSkeleton } from "@/components/dashboard/shared/DashboardSkeletons";
+import { RetryButton } from "@/components/shared/RetryButton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { getAppointmentByUserId } from "@/lib/apis/get/appointment";
@@ -63,8 +64,12 @@ async function CustomerAppointmentStats({ userId }: { userId: string }) {
           <CircleAlert />
           <AlertTitle>Could not load your appointments</AlertTitle>
           <AlertDescription>
-            Something went wrong while fetching your appointments. Please
-            refresh the page to try again.
+            <p>
+              Something went wrong while fetching your appointments. Try again,
+              and if the problem continues, check that the backend API is
+              running.
+            </p>
+            <RetryButton className="mt-3" />
           </AlertDescription>
         </Alert>
       ) : null}

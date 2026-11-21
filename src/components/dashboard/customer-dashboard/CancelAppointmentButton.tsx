@@ -37,16 +37,18 @@ export function CancelAppointmentButton({
     setCancelling(true);
 
     try {
-      await cancelAppointment(appointmentId, customerId);
+      const result = await cancelAppointment(appointmentId, customerId);
+
+      if (!result.ok) {
+        toast.error(result.message);
+        return;
+      }
+
       toast.success("Appointment cancelled.");
       setOpen(false);
       router.refresh();
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Could not cancel this appointment.",
-      );
+    } catch {
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setCancelling(false);
     }

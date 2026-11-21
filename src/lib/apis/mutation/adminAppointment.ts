@@ -1,5 +1,8 @@
 "use server";
+
 import type { AppointmentStatus } from "@/types/appointment";
+import type { ActionResult } from "../core/errors";
+import { readApiError } from "../core/errors";
 import { protectedMutation } from "../core/token-apis";
 
 type AdminAppointmentStatus = Extract<
@@ -10,15 +13,22 @@ type AdminAppointmentStatus = Extract<
 const updateAppointmentStatus = async (
   appointmentId: string,
   status: AdminAppointmentStatus,
-) => {
+): Promise<ActionResult<unknown>> => {
   const api = `${process.env.NEXT_PUBLIC_BASE_URL}/admin/appointments/${appointmentId}/status`;
   const res = await protectedMutation(api, "PATCH", { status });
-  const result = await res.json();
 
   if (!res.ok) {
-    throw new Error(result.message ?? "Could not update this appointment.");
+    return {
+      ok: false,
+      status: res.status,
+      message: await readApiError(
+        res,
+        "Could not update this appointment.",
+      ),
+    };
   }
-  return result;
+
+  return { ok: true, data: await res.json().catch(() => null) };
 };
 
 // confirm a pending appointment as an admin

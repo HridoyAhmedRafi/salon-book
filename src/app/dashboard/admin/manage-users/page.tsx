@@ -2,6 +2,7 @@ import { CircleAlert } from "lucide-react";
 
 import { AdminUsersTable } from "@/components/dashboard/admin-users/AdminUsersTable";
 import { DashboardPageHeader } from "@/components/dashboard/shared/DashboardPageHeader";
+import { RetryButton } from "@/components/shared/RetryButton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getAdminUsers } from "@/lib/apis/get/AdminUsers";
 import type { IAdminUser } from "@/types/admin-user";
@@ -29,8 +30,12 @@ const ManageUsers = async () => {
           <CircleAlert />
           <AlertTitle>Could not load customers</AlertTitle>
           <AlertDescription>
-            Refresh the page to try again. If the problem continues, check that
-            the backend API is running.
+            <p>
+              Something went wrong while fetching the customer list. Try again,
+              and if the problem continues, check that the backend API is
+              running.
+            </p>
+            <RetryButton className="mt-3" />
           </AlertDescription>
         </Alert>
       ) : (

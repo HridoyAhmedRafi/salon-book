@@ -1,4 +1,5 @@
 import type { IAdminService } from "@/types/admin-service";
+import { readApiError } from "../core/errors";
 import { getFetch } from "../core/token-apis";
 
 export const getAdminServices = async (): Promise<IAdminService[]> => {
@@ -6,8 +7,10 @@ export const getAdminServices = async (): Promise<IAdminService[]> => {
   const res = await getFetch(api);
 
   if (!res.ok) {
-    throw new Error("Failed to load services");
+    throw new Error(await readApiError(res, "Failed to load services."));
   }
 
-  return res.json();
+  const data = await res.json().catch(() => null);
+
+  return Array.isArray(data) ? (data as IAdminService[]) : [];
 };

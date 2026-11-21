@@ -6,6 +6,7 @@ import { LoaderCircle, Mail } from "lucide-react";
 import { toast } from "sonner";
 
 import { ImageUploadField } from "@/components/shared/ImageUploadField";
+import { FormAlert } from "@/components/shared/FormAlert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,6 +40,7 @@ export function CustomerProfileForm({ user }: CustomerProfileFormProps) {
   const [name, setName] = useState(user.name);
   const [image, setImage] = useState(user.image ?? "");
   const [nameError, setNameError] = useState("");
+  const [formError, setFormError] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -54,7 +56,7 @@ export function CustomerProfileForm({ user }: CustomerProfileFormProps) {
 
     if (submitting || uploadingImage) {
       if (uploadingImage) {
-        toast.error("Please wait for the photo upload to finish.");
+        setFormError("Please wait for the photo upload to finish.");
       }
 
       return;
@@ -63,6 +65,7 @@ export function CustomerProfileForm({ user }: CustomerProfileFormProps) {
     const nextNameError = trimmedName ? "" : "Name is required.";
 
     setNameError(nextNameError);
+    setFormError("");
 
     if (nextNameError) {
       return;
@@ -77,7 +80,7 @@ export function CustomerProfileForm({ user }: CustomerProfileFormProps) {
       });
 
       if (error) {
-        toast.error(error.message ?? "Could not save your profile.");
+        setFormError(error.message ?? "Could not save your profile.");
         return;
       }
 
@@ -86,7 +89,7 @@ export function CustomerProfileForm({ user }: CustomerProfileFormProps) {
       toast.success("Profile updated.");
       router.refresh();
     } catch {
-      toast.error("Something went wrong. Please try again.");
+      setFormError("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -103,6 +106,8 @@ export function CustomerProfileForm({ user }: CustomerProfileFormProps) {
 
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-6 pt-6">
+          <FormAlert>{formError}</FormAlert>
+
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
             <Avatar className="size-20 text-xl sm:size-24">
               {trimmedImage ? (
@@ -119,7 +124,10 @@ export function CustomerProfileForm({ user }: CustomerProfileFormProps) {
             <div className="flex-1 space-y-2">
               <ImageUploadField
                 value={image}
-                onChange={setImage}
+                onChange={(value) => {
+                  setImage(value);
+                  setFormError("");
+                }}
                 onUploadingChange={setUploadingImage}
                 label="Profile photo"
                 description="PNG, JPEG, WebP or GIF · up to 5 MB. Leave empty to use your initial."
@@ -140,6 +148,7 @@ export function CustomerProfileForm({ user }: CustomerProfileFormProps) {
                 value={name}
                 onChange={(event) => {
                   setName(event.target.value);
+                  setFormError("");
 
                   if (nameError) {
                     setNameError("");

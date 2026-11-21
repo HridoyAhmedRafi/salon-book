@@ -45,16 +45,18 @@ export function ConfirmAppointmentButton({
     setSubmitting(true);
 
     try {
-      await confirmAppointment(appointmentId);
+      const result = await confirmAppointment(appointmentId);
+
+      if (!result.ok) {
+        toast.error(result.message);
+        return;
+      }
+
       toast.success("Appointment confirmed.");
       setOpen(false);
       router.refresh();
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Could not confirm this appointment.",
-      );
+    } catch {
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }

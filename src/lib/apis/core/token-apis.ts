@@ -11,15 +11,18 @@ export const getServerSession = async () => {
 
 export const getToken = async () => {
   const session = await getServerSession();
-  if (!session || !session.session?.token) {
-    redirect("/unauthorized");
+  if (!session?.session?.token) {
+    redirect("/sign-in");
   }
   return session.session.token;
 };
 
 export const requiredRole = async (role: string) => {
   const session = await getServerSession();
-  if (!session || session?.user?.role !== role) {
+  if (!session) {
+    redirect("/sign-in");
+  }
+  if (session.user?.role !== role) {
     redirect("/unauthorized");
   }
 };
@@ -53,7 +56,10 @@ export const protectedMutation = async (
     },
     body: data ? JSON.stringify(data) : null,
   });
-  if (res.status === 401 || res.status === 403) {
+  // Only an invalid session is redirected. A 403 is a business rule (for
+  // example "you cannot cancel someone else's appointment") and is returned so
+  // the calling component can show the backend message.
+  if (res.status === 401) {
     redirect("/unauthorized");
   }
   return res;

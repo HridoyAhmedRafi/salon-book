@@ -3,6 +3,7 @@ import { CircleAlert, Plus } from "lucide-react";
 
 import { ManageServicesTable } from "@/components/dashboard/admin-services/ManageServicesTable";
 import { DashboardPageHeader } from "@/components/dashboard/shared/DashboardPageHeader";
+import { RetryButton } from "@/components/shared/RetryButton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { getAdminServices } from "@/lib/apis/get/AdminServices";
@@ -43,8 +44,12 @@ const ManageServices = async () => {
           <CircleAlert />
           <AlertTitle>Could not load services</AlertTitle>
           <AlertDescription>
-            Refresh the page to try again. If the problem continues, check that
-            the backend API is running.
+            <p>
+              Something went wrong while fetching the service list. Try again,
+              and if the problem continues, check that the backend API is
+              running.
+            </p>
+            <RetryButton className="mt-3" />
           </AlertDescription>
         </Alert>
       ) : (

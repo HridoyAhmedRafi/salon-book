@@ -2,6 +2,7 @@ import { CircleAlert } from "lucide-react";
 
 import { AdminAppointmentsTable } from "@/components/dashboard/admin-appointments/AdminAppointmentsTable";
 import { DashboardPageHeader } from "@/components/dashboard/shared/DashboardPageHeader";
+import { RetryButton } from "@/components/shared/RetryButton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getAllAppointments } from "@/lib/apis/get/appointment";
 import type { IAdminAppointment } from "@/types/appointment";
@@ -29,8 +30,12 @@ const ManageAppointments = async () => {
           <CircleAlert />
           <AlertTitle>Could not load appointments</AlertTitle>
           <AlertDescription>
-            Refresh the page to try again. If the problem continues, check that
-            the backend API is running.
+            <p>
+              Something went wrong while fetching the appointment list. Try
+              again, and if the problem continues, check that the backend API is
+              running.
+            </p>
+            <RetryButton className="mt-3" />
           </AlertDescription>
         </Alert>
       ) : (

@@ -3,6 +3,7 @@ import type {
   IAppointmentDocument,
   IAppointmentPost,
 } from "@/types/appointment";
+import { readApiError } from "../core/errors";
 import { getFetch } from "../core/token-apis";
 
 const toAppointment = (document: IAppointmentDocument): IAppointmentPost => ({
@@ -36,7 +37,9 @@ export const getAppointmentByUserId = async (
   const res = await getFetch(api);
 
   if (!res.ok) {
-    throw new Error(`Failed to load appointments (${res.status})`);
+    throw new Error(
+      await readApiError(res, "Could not load your appointments."),
+    );
   }
 
   const data: IAppointmentDocument[] = await res.json();
@@ -50,7 +53,9 @@ export const getAllAppointments = async (): Promise<IAdminAppointment[]> => {
   const res = await getFetch(api);
 
   if (!res.ok) {
-    throw new Error(`Failed to load appointments (${res.status})`);
+    throw new Error(
+      await readApiError(res, "Could not load the appointment list."),
+    );
   }
 
   const data: IAppointmentDocument[] = await res.json();

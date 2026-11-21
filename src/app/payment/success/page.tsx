@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CheckCircle2, AlertCircle, Clock } from "lucide-react";
 import { verifyPayment } from "@/types/payment";
+import { RetryButton } from "@/components/shared/RetryButton";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -68,13 +69,15 @@ const PaymentSuccessPage = async ({ searchParams }: Props) => {
                 "Your payment is still being processed. Please check back shortly."}
             </CardDescription>
           </CardHeader>
-          <CardFooter className="flex justify-center gap-3">
+          <CardFooter className="flex flex-wrap justify-center gap-3">
             <Button
               variant="outline"
               render={<Link href="/dashboard/customer/my-appointments" />}
             >
               Check My Appointments
             </Button>
+
+            <RetryButton label="Check again" />
           </CardFooter>
         </Card>
       </div>

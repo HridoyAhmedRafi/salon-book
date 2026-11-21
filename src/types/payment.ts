@@ -1,35 +1,37 @@
 "use server";
 
+import type { ActionResult } from "@/lib/apis/core/errors";
+import { readApiError } from "@/lib/apis/core/errors";
 import { getFetch, protectedMutation } from "@/lib/apis/core/token-apis";
 
-const getErrorMessage = async (res: Response, fallback: string) => {
-  try {
-    const data: { message?: unknown } = await res.json();
-
-    return typeof data.message === "string" ? data.message : fallback;
-  } catch {
-    return fallback;
-  }
-};
-
-export const createCheckoutSession = async (appointmentId: string) => {
+export const createCheckoutSession = async (
+  appointmentId: string,
+): Promise<ActionResult<string>> => {
   const api = `${process.env.NEXT_PUBLIC_BASE_URL}/payments/create-checkout-session`;
 
   const res = await protectedMutation(api, "POST", { appointmentId });
 
   if (!res.ok) {
-    throw new Error(
-      await getErrorMessage(res, "Could not create payment session."),
-    );
+    return {
+      ok: false,
+      status: res.status,
+      message: await readApiError(res, "Could not create payment session."),
+    };
   }
 
-  const data: { url?: string } = await res.json();
+  const data = (await res.json().catch(() => null)) as {
+    url?: string;
+  } | null;
 
-  if (!data.url) {
-    throw new Error("Checkout URL not found.");
+  if (!data?.url) {
+    return {
+      ok: false,
+      status: res.status,
+      message: "The payment link is missing. Please try again.",
+    };
   }
 
-  return data.url;
+  return { ok: true, data: data.url };
 };
 
 export const verifyPayment = async (sessionId: string) => {
@@ -38,7 +40,7 @@ export const verifyPayment = async (sessionId: string) => {
   const res = await getFetch(api);
 
   if (!res.ok) {
-    throw new Error(await getErrorMessage(res, "Could not verify payment."));
+    throw new Error(await readApiError(res, "Could not verify payment."));
   }
 
   const data: {

@@ -1,23 +1,40 @@
-import { Home } from "lucide-react";
 import Link from "next/link";
+import { Ban, Home } from "lucide-react";
+
+import { SignOutButton } from "@/components/dashboard/shared/SignOutButton";
+import { buttonVariants } from "@/components/ui/button";
 
 export default function BlockedPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold">Account Blocked</h1>
+    <main className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md rounded-2xl border bg-card p-8 text-center shadow-sm">
+        <div className="mx-auto mb-6 flex size-20 items-center justify-center rounded-full bg-destructive/10">
+          <Ban className="size-10 text-destructive" />
+        </div>
 
-        <p className="mt-3 text-muted-foreground">
-          Your account has been blocked. Please contact support for assistance.
+        <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-destructive">
+          Account blocked
         </p>
-        <Link
-          href="/"
-          className="mt-3 inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-        >
-          <Home className="size-4" />
-          Back to Home
-        </Link>
+
+        <h1 className="mb-3 text-3xl font-bold tracking-tight">
+          Access paused
+        </h1>
+
+        <p className="mb-8 text-muted-foreground">
+          Your account has been blocked by the salon. If you believe this is a
+          mistake, please contact support. You can sign out and use another
+          account in the meantime.
+        </p>
+
+        <div className="flex flex-col gap-3">
+          <SignOutButton />
+
+          <Link href="/" className={buttonVariants({ variant: "ghost" })}>
+            <Home />
+            Back home
+          </Link>
+        </div>
       </div>
-    </div>
+    </main>
   );
 }

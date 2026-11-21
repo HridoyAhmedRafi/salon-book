@@ -10,6 +10,8 @@ import {
   Scissors,
 } from "lucide-react";
 
+import { FieldError } from "@/components/shared/FieldError";
+import { FormAlert } from "@/components/shared/FormAlert";
 import { ImageUploadField } from "@/components/shared/ImageUploadField";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +25,10 @@ import {
 } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { AddService } from "@/lib/apis/mutation/service";
-import { IService } from "@/types/service";
+import {
+  validateServiceValues,
+  type ServiceFormErrors,
+} from "@/lib/validation/service";
 import { toast } from "sonner";
 
 export default function AddServiceForm() {
@@ -31,48 +36,63 @@ export default function AddServiceForm() {
   const [image, setImage] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<ServiceFormErrors>({});
+  const [formError, setFormError] = useState("");
+
+  const clearError = (field: keyof ServiceFormErrors) => {
+    setErrors((current) =>
+      current[field] ? { ...current, [field]: undefined } : current,
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (submitting || uploadingImage) {
-      return;
-    }
+      if (uploadingImage) {
+        setFormError("Please wait for the image upload to finish.");
+      }
 
-    if (!image) {
-      toast.error("Upload a service image.");
       return;
     }
 
     const formData = new FormData(e.currentTarget);
 
-    const service: IService = {
+    const { errors: nextErrors, service } = validateServiceValues({
       serviceName: String(formData.get("serviceName") ?? ""),
       category: String(formData.get("category") ?? ""),
       description: String(formData.get("description") ?? ""),
-      price: Number(formData.get("price") ?? 0),
-      duration: Number(formData.get("duration") ?? 0),
+      price: String(formData.get("price") ?? ""),
+      duration: String(formData.get("duration") ?? ""),
       image,
-    };
+    });
+
+    setErrors(nextErrors);
+    setFormError("");
+
+    if (!service) {
+      return;
+    }
 
     setSubmitting(true);
 
     try {
       const result = await AddService(service);
 
-      if (result.acknowledged === true) {
-        toast.success("Service added successfully!");
-        router.push("/dashboard/admin/manage-services");
+      if (!result.ok) {
+        setFormError(result.message);
         return;
       }
 
-      toast.error("Could not add the service. Please try again.");
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Could not add the service. Please try again.",
-      );
+      if (result.data.acknowledged !== true) {
+        setFormError("Could not add the service. Please try again.");
+        return;
+      }
+
+      toast.success("Service added successfully!");
+      router.push("/dashboard/admin/manage-services");
+    } catch {
+      setFormError("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -118,7 +138,9 @@ export default function AddServiceForm() {
           </CardHeader>
 
           <CardContent className="px-6 py-7 md:px-8 md:py-9">
-            <form onSubmit={handleSubmit} className="space-y-7">
+            <form onSubmit={handleSubmit} noValidate className="space-y-7">
+              <FormAlert>{formError}</FormAlert>
+
               {/* Service Name */}
               <div className="space-y-2">
                 <Label htmlFor="serviceName">Service Name</Label>
@@ -128,8 +150,16 @@ export default function AddServiceForm() {
                   name="serviceName"
                   placeholder="e.g. Hair Styling & Treatment"
                   className="h-11"
-                  required
+                  aria-invalid={Boolean(errors.serviceName)}
+                  aria-describedby={
+                    errors.serviceName ? "serviceName-error" : undefined
+                  }
+                  onChange={() => clearError("serviceName")}
                 />
+
+                <FieldError id="serviceName-error">
+                  {errors.serviceName}
+                </FieldError>
               </div>
 
               {/* Category */}
@@ -139,21 +169,26 @@ export default function AddServiceForm() {
                 <select
                   id="category"
                   name="category"
-                  required
                   defaultValue=""
                   className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-[#d1234c] focus-visible:ring-2 focus-visible:ring-[#d1234c]/20"
+                  aria-invalid={Boolean(errors.category)}
+                  aria-describedby={
+                    errors.category ? "category-error" : undefined
+                  }
+                  onChange={() => clearError("category")}
                 >
                   <option value="" disabled>
                     Select a category
                   </option>
-                  <option value="">All Categories</option>
                   <option value="Hair">Hair</option>
                   <option value="Skin">Skin Care</option>
                   <option value="Nails">Nail Care</option>
                   <option value="Makeup">Makeup</option>
-                  <option value="Spa">Spa & Massage</option>
+                  <option value="Spa">Spa &amp; Massage</option>
                   <option value="Other">Other</option>
                 </select>
+
+                <FieldError id="category-error">{errors.category}</FieldError>
               </div>
 
               {/* Description */}
@@ -165,8 +200,16 @@ export default function AddServiceForm() {
                   name="description"
                   placeholder="Describe the service, its benefits and what customers can expect..."
                   className="min-h-36 resize-y"
-                  required
+                  aria-invalid={Boolean(errors.description)}
+                  aria-describedby={
+                    errors.description ? "description-error" : undefined
+                  }
+                  onChange={() => clearError("description")}
                 />
+
+                <FieldError id="description-error">
+                  {errors.description}
+                </FieldError>
               </div>
 
               {/* Price & Duration */}
@@ -184,9 +227,15 @@ export default function AddServiceForm() {
                       min="0"
                       placeholder="e.g. 1500"
                       className="h-11 pl-9"
-                      required
+                      aria-invalid={Boolean(errors.price)}
+                      aria-describedby={
+                        errors.price ? "price-error" : undefined
+                      }
+                      onChange={() => clearError("price")}
                     />
                   </div>
+
+                  <FieldError id="price-error">{errors.price}</FieldError>
                 </div>
 
                 <div className="space-y-2">
@@ -202,22 +251,35 @@ export default function AddServiceForm() {
                       min="1"
                       placeholder="e.g. 60"
                       className="h-11 pl-9"
-                      required
+                      aria-invalid={Boolean(errors.duration)}
+                      aria-describedby={
+                        errors.duration ? "duration-error" : undefined
+                      }
+                      onChange={() => clearError("duration")}
                     />
                   </div>
+
+                  <FieldError id="duration-error">{errors.duration}</FieldError>
                 </div>
               </div>
 
               {/* Image */}
-              <ImageUploadField
-                value={image}
-                onChange={setImage}
-                onUploadingChange={setUploadingImage}
-                label="Service image"
-                description="PNG, JPEG, WebP or GIF · up to 5 MB."
-                required
-                disabled={submitting}
-              />
+              <div className="space-y-2">
+                <ImageUploadField
+                  value={image}
+                  onChange={(value) => {
+                    setImage(value);
+                    clearError("image");
+                  }}
+                  onUploadingChange={setUploadingImage}
+                  label="Service image"
+                  description="PNG, JPEG, WebP or GIF · up to 5 MB."
+                  required
+                  disabled={submitting}
+                />
+
+                <FieldError id="image-error">{errors.image}</FieldError>
+              </div>
 
               {/* Actions */}
               <div className="flex flex-col-reverse gap-3 border-t border-border/60 pt-6 sm:flex-row sm:justify-end">
@@ -233,6 +295,7 @@ export default function AddServiceForm() {
                 <Button
                   type="submit"
                   disabled={submitting || uploadingImage}
+                  aria-busy={submitting}
                   className="cursor-pointer bg-[#d1234c] text-white hover:bg-[#b91f43] sm:min-w-40"
                 >
                   {submitting ? (

@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { Home, ShieldAlert } from "lucide-react";
+import { Home, LogIn, ShieldAlert } from "lucide-react";
+
+import { buttonVariants } from "@/components/ui/button";
 
 const UnauthorizedPage = () => {
   return (
@@ -14,21 +16,28 @@ const UnauthorizedPage = () => {
         </p>
 
         <h1 className="mb-3 text-3xl font-bold tracking-tight">
-          Access Denied
+          Access denied
         </h1>
 
         <p className="mb-8 text-muted-foreground">
-          Sorry, you don not have permission to access this page. Please return
-          to the homepage.
+          You don&apos;t have permission to view this page. If you think this is
+          a mistake, sign in with the right account or return to the homepage.
         </p>
 
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-        >
-          <Home className="size-4" />
-          Back to Home
-        </Link>
+        <div className="flex flex-col justify-center gap-3 sm:flex-row">
+          <Link href="/sign-in" className={buttonVariants({ size: "lg" })}>
+            <LogIn />
+            Sign in
+          </Link>
+
+          <Link
+            href="/"
+            className={buttonVariants({ variant: "outline", size: "lg" })}
+          >
+            <Home />
+            Back home
+          </Link>
+        </div>
       </div>
     </main>
   );

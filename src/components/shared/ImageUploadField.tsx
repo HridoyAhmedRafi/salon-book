@@ -178,7 +178,11 @@ export function ImageUploadField({
         <p className="text-xs text-muted-foreground">{description}</p>
       ) : null}
 
-      {error ? <p className="text-xs text-destructive">{error}</p> : null}
+      {error ? (
+        <p role="alert" aria-live="polite" className="text-xs text-destructive">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

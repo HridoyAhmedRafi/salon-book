@@ -40,16 +40,18 @@ export function DeleteServiceButton({ service }: DeleteServiceButtonProps) {
     setSubmitting(true);
 
     try {
-      await deleteService(service._id);
+      const result = await deleteService(service._id);
+
+      if (!result.ok) {
+        toast.error(result.message);
+        return;
+      }
+
       toast.success("Service deleted.");
       setOpen(false);
       router.refresh();
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Could not delete this service.",
-      );
+    } catch {
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }

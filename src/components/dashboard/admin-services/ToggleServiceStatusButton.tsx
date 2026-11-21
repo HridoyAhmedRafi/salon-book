@@ -48,16 +48,18 @@ export function ToggleServiceStatusButton({
     setSubmitting(true);
 
     try {
-      await updateServiceStatus(service._id, nextStatus);
+      const result = await updateServiceStatus(service._id, nextStatus);
+
+      if (!result.ok) {
+        toast.error(result.message);
+        return;
+      }
+
       toast.success(activating ? "Service activated." : "Service deactivated.");
       setOpen(false);
       router.refresh();
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Could not update the service status.",
-      );
+    } catch {
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }

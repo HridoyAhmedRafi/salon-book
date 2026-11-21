@@ -40,16 +40,18 @@ export function BlockUserButton({ user }: BlockUserButtonProps) {
     setSubmitting(true);
 
     try {
-      await setUserBlocked(user._id, true);
+      const result = await setUserBlocked(user._id, true);
+
+      if (!result.ok) {
+        toast.error(result.message);
+        return;
+      }
+
       toast.success("Customer blocked.");
       setOpen(false);
       router.refresh();
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Could not block this customer.",
-      );
+    } catch {
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }

@@ -11,6 +11,8 @@ import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { BookAppointment } from "@/lib/apis/mutation/appointment";
+import { FieldError } from "@/components/shared/FieldError";
+import { FormAlert } from "@/components/shared/FormAlert";
 
 interface ServiceBookingFormProps {
   serviceId: string;
@@ -44,6 +46,9 @@ const AppointmentForm = ({
   const [appointmentDate, setAppointmentDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
   const [message, setMessage] = useState("");
+  const [dateError, setDateError] = useState("");
+  const [slotError, setSlotError] = useState("");
+  const [formError, setFormError] = useState("");
   const [requesting, setRequesting] = useState(false);
   const router = useRouter();
 
@@ -64,13 +69,30 @@ const AppointmentForm = ({
       return;
     }
 
+    setFormError("");
+
     if (!user?.id) {
       toast.error("Please sign in to request an appointment.");
       router.push("/sign-in");
       return;
     }
+
     if (user.role !== "customer") {
-      toast.message("Only customer can request an appointment.");
+      setFormError("Only customers can request an appointment.");
+      return;
+    }
+
+    const nextDateError = !appointmentDate
+      ? "Choose an appointment date."
+      : appointmentDate < minDate
+        ? "Choose today or a later date."
+        : "";
+    const nextSlotError = timeSlot ? "" : "Choose a time slot.";
+
+    setDateError(nextDateError);
+    setSlotError(nextSlotError);
+
+    if (nextDateError || nextSlotError) {
       return;
     }
 
@@ -93,19 +115,31 @@ const AppointmentForm = ({
     try {
       const result = await BookAppointment(bookingData);
 
-      if (result.acknowledged === true) {
+      if (result.ok && result.data.acknowledged === true) {
         toast.success("Appointment booked successfully!");
         router.push("/services");
         return;
       }
 
-      toast.error("Could not send your appointment request. Please try again.");
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("Something went wrong!");
+      if (!result.ok && result.status === 409) {
+        setFormError(
+          "This time slot was just booked. Please choose a different time.",
+        );
+        setTimeSlot("");
+        toast.error("That time slot is no longer available.");
+        return;
       }
+
+      const failureMessage = result.ok
+        ? "Could not send your appointment request. Please try again."
+        : result.message;
+
+      setFormError(failureMessage);
+      toast.error(failureMessage);
+    } catch {
+      const failureMessage = "Something went wrong. Please try again.";
+      setFormError(failureMessage);
+      toast.error(failureMessage);
     } finally {
       setRequesting(false);
     }
@@ -141,7 +175,7 @@ const AppointmentForm = ({
         </div>
       </div>
 
-      <form onSubmit={handleBooking} className="space-y-5">
+      <form onSubmit={handleBooking} noValidate className="space-y-5">
         {/* Appointment Date */}
         <div className="space-y-2">
           <label
@@ -161,10 +195,16 @@ const AppointmentForm = ({
             onChange={(e) => {
               setAppointmentDate(e.target.value);
               setTimeSlot("");
+              setDateError("");
+              setSlotError("");
+              setFormError("");
             }}
-            required
+            aria-invalid={Boolean(dateError)}
+            aria-describedby={dateError ? "appointmentDate-error" : undefined}
             className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-[#d2a01f] focus:ring-2 focus:ring-[#d2a01f]/20"
           />
+
+          <FieldError id="appointmentDate-error">{dateError}</FieldError>
         </div>
 
         {/* Available Time Slots */}
@@ -174,13 +214,23 @@ const AppointmentForm = ({
             Available Time Slot
           </label>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div
+            role="group"
+            aria-label="Available time slots"
+            aria-describedby={slotError ? "timeSlot-error" : undefined}
+            className="grid grid-cols-2 gap-2"
+          >
             {timeSlots.map((slot) => (
               <button
                 key={slot}
                 type="button"
                 disabled={!appointmentDate || requesting}
-                onClick={() => setTimeSlot(slot)}
+                aria-pressed={timeSlot === slot}
+                onClick={() => {
+                  setTimeSlot(slot);
+                  setSlotError("");
+                  setFormError("");
+                }}
                 className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
                   timeSlot === slot
                     ? "border-[#d2a01f] bg-[#d2a01f] text-white"
@@ -192,11 +242,17 @@ const AppointmentForm = ({
             ))}
           </div>
 
+          <FieldError id="timeSlot-error">{slotError}</FieldError>
+
           {!appointmentDate && (
             <p className="text-xs text-muted-foreground">
               Select a date first to choose a time slot.
             </p>
           )}
+
+          {formError ? (
+            <FormAlert>{formError}</FormAlert>
+          ) : null}
         </div>
 
         {/* Additional Message */}

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { LoaderCircle, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
+import { FieldError } from "@/components/shared/FieldError";
+import { FormAlert } from "@/components/shared/FormAlert";
 import { ImageUploadField } from "@/components/shared/ImageUploadField";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +23,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { updateService } from "@/lib/apis/mutation/adminService";
-import { getValidImageUrl } from "@/lib/image";
+import {
+  validateServiceValues,
+  type ServiceFormErrors,
+} from "@/lib/validation/service";
 import type { IAdminService } from "@/types/admin-service";
 
 import { serviceCategories } from "./categories";
@@ -48,6 +53,14 @@ export function EditServiceButton({ service }: EditServiceButtonProps) {
   const [duration, setDuration] = useState(String(service.duration));
   const [image, setImage] = useState(service.image);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [errors, setErrors] = useState<ServiceFormErrors>({});
+  const [formError, setFormError] = useState("");
+
+  const clearError = (field: keyof ServiceFormErrors) => {
+    setErrors((current) =>
+      current[field] ? { ...current, [field]: undefined } : current,
+    );
+  };
 
   const resetForm = () => {
     setServiceName(service.serviceName);
@@ -57,6 +70,8 @@ export function EditServiceButton({ service }: EditServiceButtonProps) {
     setDuration(String(service.duration));
     setImage(service.image);
     setUploadingImage(false);
+    setErrors({});
+    setFormError("");
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -71,56 +86,44 @@ export function EditServiceButton({ service }: EditServiceButtonProps) {
     event.preventDefault();
 
     if (submitting || uploadingImage) {
+      if (uploadingImage) {
+        setFormError("Please wait for the image upload to finish.");
+      }
+
       return;
     }
 
-    const nextName = serviceName.trim();
-    const nextDescription = description.trim();
-    const nextImage = getValidImageUrl(image);
-    const nextPrice = Number(price);
-    const nextDuration = Number(duration);
+    const { errors: nextErrors, service: nextService } = validateServiceValues({
+      serviceName,
+      category,
+      description,
+      price,
+      duration,
+      image,
+    });
 
-    if (!nextName || !nextDescription || !category) {
-      toast.error("Please complete every field.");
-      return;
-    }
+    setErrors(nextErrors);
+    setFormError("");
 
-    if (!nextImage) {
-      toast.error("Upload a service image.");
-      return;
-    }
-
-    if (!Number.isFinite(nextPrice) || nextPrice < 0) {
-      toast.error("Enter a valid price.");
-      return;
-    }
-
-    if (!Number.isFinite(nextDuration) || nextDuration < 1) {
-      toast.error("Enter a valid duration.");
+    if (!nextService) {
       return;
     }
 
     setSubmitting(true);
 
     try {
-      await updateService(service._id, {
-        serviceName: nextName,
-        category,
-        description: nextDescription,
-        price: nextPrice,
-        duration: nextDuration,
-        image: nextImage,
-      });
+      const result = await updateService(service._id, nextService);
+
+      if (!result.ok) {
+        setFormError(result.message);
+        return;
+      }
 
       toast.success("Service updated.");
       setOpen(false);
       router.refresh();
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Could not update this service.",
-      );
+    } catch {
+      setFormError("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -142,7 +145,7 @@ export function EditServiceButton({ service }: EditServiceButtonProps) {
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-2xl">
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} noValidate className="space-y-5">
           <DialogHeader>
             <DialogTitle>Edit service</DialogTitle>
             <DialogDescription>
@@ -151,16 +154,30 @@ export function EditServiceButton({ service }: EditServiceButtonProps) {
           </DialogHeader>
 
           <div className="space-y-4">
+            <FormAlert>{formError}</FormAlert>
+
             <div className="space-y-2">
               <Label htmlFor={`serviceName-${service._id}`}>Service name</Label>
 
               <Input
                 id={`serviceName-${service._id}`}
                 value={serviceName}
-                onChange={(event) => setServiceName(event.target.value)}
+                onChange={(event) => {
+                  setServiceName(event.target.value);
+                  clearError("serviceName");
+                }}
                 className="h-10"
-                required
+                aria-invalid={Boolean(errors.serviceName)}
+                aria-describedby={
+                  errors.serviceName
+                    ? `serviceName-error-${service._id}`
+                    : undefined
+                }
               />
+
+              <FieldError id={`serviceName-error-${service._id}`}>
+                {errors.serviceName}
+              </FieldError>
             </div>
 
             <div className="space-y-2">
@@ -169,9 +186,15 @@ export function EditServiceButton({ service }: EditServiceButtonProps) {
               <select
                 id={`category-${service._id}`}
                 value={category}
-                onChange={(event) => setCategory(event.target.value)}
+                onChange={(event) => {
+                  setCategory(event.target.value);
+                  clearError("category");
+                }}
                 className={selectClass}
-                required
+                aria-invalid={Boolean(errors.category)}
+                aria-describedby={
+                  errors.category ? `category-error-${service._id}` : undefined
+                }
               >
                 <option value="" disabled>
                   Select a category
@@ -183,6 +206,10 @@ export function EditServiceButton({ service }: EditServiceButtonProps) {
                   </option>
                 ))}
               </select>
+
+              <FieldError id={`category-error-${service._id}`}>
+                {errors.category}
+              </FieldError>
             </div>
 
             <div className="space-y-2">
@@ -191,10 +218,22 @@ export function EditServiceButton({ service }: EditServiceButtonProps) {
               <Textarea
                 id={`description-${service._id}`}
                 value={description}
-                onChange={(event) => setDescription(event.target.value)}
+                onChange={(event) => {
+                  setDescription(event.target.value);
+                  clearError("description");
+                }}
                 className="min-h-28 resize-y"
-                required
+                aria-invalid={Boolean(errors.description)}
+                aria-describedby={
+                  errors.description
+                    ? `description-error-${service._id}`
+                    : undefined
+                }
               />
+
+              <FieldError id={`description-error-${service._id}`}>
+                {errors.description}
+              </FieldError>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
@@ -206,10 +245,20 @@ export function EditServiceButton({ service }: EditServiceButtonProps) {
                   type="number"
                   min="0"
                   value={price}
-                  onChange={(event) => setPrice(event.target.value)}
+                  onChange={(event) => {
+                    setPrice(event.target.value);
+                    clearError("price");
+                  }}
                   className="h-10"
-                  required
+                  aria-invalid={Boolean(errors.price)}
+                  aria-describedby={
+                    errors.price ? `price-error-${service._id}` : undefined
+                  }
                 />
+
+                <FieldError id={`price-error-${service._id}`}>
+                  {errors.price}
+                </FieldError>
               </div>
 
               <div className="space-y-2">
@@ -222,22 +271,43 @@ export function EditServiceButton({ service }: EditServiceButtonProps) {
                   type="number"
                   min="1"
                   value={duration}
-                  onChange={(event) => setDuration(event.target.value)}
+                  onChange={(event) => {
+                    setDuration(event.target.value);
+                    clearError("duration");
+                  }}
                   className="h-10"
-                  required
+                  aria-invalid={Boolean(errors.duration)}
+                  aria-describedby={
+                    errors.duration
+                      ? `duration-error-${service._id}`
+                      : undefined
+                  }
                 />
+
+                <FieldError id={`duration-error-${service._id}`}>
+                  {errors.duration}
+                </FieldError>
               </div>
             </div>
 
-            <ImageUploadField
-              value={image}
-              onChange={setImage}
-              onUploadingChange={setUploadingImage}
-              label="Service image"
-              description="PNG, JPEG, WebP or GIF · up to 5 MB."
-              required
-              disabled={submitting}
-            />
+            <div className="space-y-2">
+              <ImageUploadField
+                value={image}
+                onChange={(value) => {
+                  setImage(value);
+                  clearError("image");
+                }}
+                onUploadingChange={setUploadingImage}
+                label="Service image"
+                description="PNG, JPEG, WebP or GIF · up to 5 MB."
+                required
+                disabled={submitting}
+              />
+
+              <FieldError id={`image-error-${service._id}`}>
+                {errors.image}
+              </FieldError>
+            </div>
           </div>
 
           <DialogFooter>
@@ -248,6 +318,7 @@ export function EditServiceButton({ service }: EditServiceButtonProps) {
             <Button
               type="submit"
               disabled={submitting || uploadingImage}
+              aria-busy={submitting}
               className="min-w-32 cursor-pointer"
             >
               {submitting ? <LoaderCircle className="animate-spin" /> : null}

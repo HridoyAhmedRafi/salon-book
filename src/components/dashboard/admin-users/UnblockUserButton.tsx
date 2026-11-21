@@ -40,16 +40,18 @@ export function UnblockUserButton({ user }: UnblockUserButtonProps) {
     setSubmitting(true);
 
     try {
-      await setUserBlocked(user._id, false);
+      const result = await setUserBlocked(user._id, false);
+
+      if (!result.ok) {
+        toast.error(result.message);
+        return;
+      }
+
       toast.success("Customer unblocked.");
       setOpen(false);
       router.refresh();
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Could not unblock this customer.",
-      );
+    } catch {
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }
