@@ -20,7 +20,7 @@ type FieldErrors = {
   password?: string;
 };
 
-const SignInForm = ({ redirectTo }: { redirectTo: string }) => {
+const SignInForm = () => {
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -74,7 +74,7 @@ const SignInForm = ({ redirectTo }: { redirectTo: string }) => {
       }
 
       toast.success("Welcome back!");
-      router.push(redirectTo);
+      router.push("/dashboard");
       router.refresh();
     } catch {
       setFormError("Something went wrong. Please try again.");
@@ -87,17 +87,12 @@ const SignInForm = ({ redirectTo }: { redirectTo: string }) => {
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: new URL(redirectTo, window.location.origin).toString(),
+        callbackURL: new URL("/dashboard", window.location.origin).toString(),
       });
     } catch {
       toast.error("Could not start Google sign in. Please try again.");
     }
   };
-
-  const signUpHref =
-    redirectTo === "/"
-      ? "/sign-up"
-      : `/sign-up?redirect=${encodeURIComponent(redirectTo)}`;
 
   return (
     <main className="flex flex-1 items-center justify-center px-4 py-12">
@@ -224,7 +219,7 @@ const SignInForm = ({ redirectTo }: { redirectTo: string }) => {
         <p className="mt-7 text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
           <Link
-            href={signUpHref}
+            href="/sign-up"
             className="font-semibold text-foreground underline-offset-4 transition-colors hover:text-primary hover:underline"
           >
             Create one

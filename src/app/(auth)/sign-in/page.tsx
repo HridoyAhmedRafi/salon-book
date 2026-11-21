@@ -1,15 +1,19 @@
-import { safeRedirectPath } from "@/lib/redirect";
-
 import SignInForm from "./SignInForm";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-interface SignInPageProps {
-  searchParams: Promise<{ redirect?: string | string[] }>;
-}
+const SignInPage = async () => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  const user = session?.user;
 
-const SignInPage = async ({ searchParams }: SignInPageProps) => {
-  const { redirect } = await searchParams;
+  if (user) {
+    redirect(`/dashboard/${user.role === "admin" ? "admin" : "customer"}`);
+  }
 
-  return <SignInForm redirectTo={safeRedirectPath(redirect)} />;
+  return <SignInForm />;
 };
 
 export default SignInPage;
