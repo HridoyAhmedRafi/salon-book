@@ -32,6 +32,7 @@ dns.setServers(["8.8.8.8", "8.8.4.4"]);
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
+import { auth } from "./lib/auth";
 
 type SessionResponse = {
   user?: {
@@ -59,18 +60,19 @@ export async function proxy(request: NextRequest) {
   }
 
   // 2. Direct auth.api.getSession() er bodole API route theke session fetch
-  let session: SessionResponse = null;
+  let session = null;
   try {
-    const res = await fetch(new URL("/api/auth/get-session", request.url), {
-      headers: {
-        cookie: request.headers.get("cookie") || "",
-      },
-      cache: "no-store",
-    });
+    // const res = await fetch(new URL("/api/auth/get-session", request.url), {
+    //   headers: {
+    //     cookie: request.headers.get("cookie") || "",
+    //   },
+    //   cache: "no-store",
+    // });
 
-    if (res.ok) {
-      session = await res.json();
-    }
+    // if (res.ok) {
+    //   session = await res.json();
+    // }
+    session = await auth.api.getSession({ headers: request.headers });
   } catch {
     return redirectToSignIn();
   }
