@@ -11,18 +11,18 @@ export const getServerSession = async () => {
 
 export const getToken = async () => {
   const session = await getServerSession();
-  if (!session?.session?.token) {
-    redirect("/sign-in");
-  }
-  return session.session.token;
+  // if (!session?.session?.token) {
+  //   redirect("/sign-in");
+  // }
+  return session?.session.token;
 };
 
 export const requiredRole = async (role: string) => {
   const session = await getServerSession();
-  if (!session) {
-    redirect("/sign-in");
-  }
-  if (session.user?.role !== role) {
+  // if (!session) {
+  //   redirect("/sign-in");
+  // }
+  if (session?.user?.role !== role) {
     redirect("/unauthorized");
   }
 };

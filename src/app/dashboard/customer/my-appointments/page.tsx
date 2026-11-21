@@ -18,15 +18,15 @@ const MyAppointments = async () => {
   const session = await auth.api.getSession({ headers: await headers() });
   const user = session?.user;
 
-  if (!user?.id) {
-    redirect("/sign-in");
-  }
+  // if (!user?.id) {
+  //   redirect("/sign-in");
+  // }
 
   let appointments: IAppointmentPost[] = [];
   let loadFailed = false;
 
   try {
-    appointments = await getAppointmentByUserId(user.id);
+    appointments = await getAppointmentByUserId(user?.id as string);
   } catch {
     loadFailed = true;
   }

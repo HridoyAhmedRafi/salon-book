@@ -19,7 +19,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-type Role = "customer" | "admin";
+export type Role = "customer" | "admin";
 
 type MenuItem = {
   _id: string;

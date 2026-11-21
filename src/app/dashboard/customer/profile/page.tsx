@@ -14,17 +14,17 @@ const CustomerProfile = async () => {
   const session = await auth.api.getSession({ headers: await headers() });
   const user = session?.user;
 
-  if (!user?.id) {
-    redirect("/sign-in");
-  }
+  // if (!user?.id) {
+  //   redirect("/sign-in");
+  // }
 
   const profile: IProfileUser = {
-    name: user.name ?? "",
-    email: user.email ?? "",
-    image: user.image ?? null,
-    role: user.role ?? "customer",
-    isBlocked: user.isBlocked ?? false,
-    createdAt: new Date(user.createdAt).toISOString(),
+    name: user?.name ?? "",
+    email: user?.email ?? "",
+    image: user?.image ?? null,
+    role: user?.role ?? "customer",
+    isBlocked: user?.isBlocked ?? false,
+    createdAt: new Date(user?.createdAt as Date).toISOString(),
   };
 
   return (

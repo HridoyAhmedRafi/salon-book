@@ -18,15 +18,15 @@ const CustomerDashboard = async () => {
   const session = await auth.api.getSession({ headers: await headers() });
   const user = session?.user;
 
-  if (!user?.id) {
-    redirect("/sign-in");
-  }
+  // if (!user?.id) {
+  //   redirect("/sign-in");
+  // }
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-8">
       <DashboardPageHeader
         eyebrow="Your account"
-        title={`Welcome back, ${user.name}`}
+        title={`Welcome back, ${user?.name}`}
         description="A clear view of your appointments and what's coming up next."
         actions={
           <Button
@@ -41,7 +41,7 @@ const CustomerDashboard = async () => {
       />
 
       <Suspense fallback={<DashboardStatsSkeleton count={4} columns={4} />}>
-        <CustomerAppointmentStats userId={user.id} />
+        <CustomerAppointmentStats userId={user?.id as string} />
       </Suspense>
     </div>
   );

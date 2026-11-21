@@ -11,7 +11,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { Button } from "../ui/button";
-import { DashboardNav } from "./DashboardNav";
+import { DashboardNav, Role } from "./DashboardNav";
 
 export async function DashboardSidebar() {
   const session = await auth.api.getSession({
@@ -20,9 +20,9 @@ export async function DashboardSidebar() {
 
   const role = session?.user.role;
 
-  if (!role || (role !== "customer" && role !== "admin")) {
-    redirect("/sign-in");
-  }
+  // if (!role || (role !== "customer" && role !== "admin")) {
+  //   redirect("/sign-in");
+  // }
 
   return (
     <Sidebar>
@@ -33,7 +33,7 @@ export async function DashboardSidebar() {
             Home
           </Button>
 
-          <DashboardNav role={role} />
+          <DashboardNav role={role as Role} />
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter />
