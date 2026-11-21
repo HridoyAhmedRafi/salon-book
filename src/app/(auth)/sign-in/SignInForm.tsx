@@ -66,15 +66,15 @@ const SignInForm = () => {
     setSubmitting(true);
 
     try {
-      const { error } = await signIn.email({ email, password });
+      const { data, error } = await signIn.email({ email, password });
 
       if (error) {
         setFormError(error.message ?? "Invalid email or password.");
         return;
       }
-
+      const role = data?.user.role;
       toast.success("Welcome back!");
-      router.push("/dashboard");
+      router.push(`/dashboard/${role}`);
       router.refresh();
     } catch {
       setFormError("Something went wrong. Please try again.");
@@ -87,7 +87,7 @@ const SignInForm = () => {
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: new URL("/dashboard", window.location.origin).toString(),
+        callbackURL: "/",
       });
     } catch {
       toast.error("Could not start Google sign in. Please try again.");
