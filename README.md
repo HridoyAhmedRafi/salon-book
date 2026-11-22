@@ -119,7 +119,7 @@ BETTER_AUTH_SECRET=
 BETTER_AUTH_URL=
 MONGODB_URI=
 NEXT_PUBLIC_BASE_URL=
-NEXT_PUBLIC_IMGBB_API_KEY=
+IMGBB_API_KEY=
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 ```
@@ -130,7 +130,7 @@ GOOGLE_CLIENT_SECRET=
 | `BETTER_AUTH_URL` | Public base URL of the Next.js application |
 | `MONGODB_URI` | MongoDB connection string used by Better Auth |
 | `NEXT_PUBLIC_BASE_URL` | Base URL of the SalonBook server API |
-| `NEXT_PUBLIC_IMGBB_API_KEY` | ImgBB API key for image uploads |
+| `IMGBB_API_KEY` | ImgBB API key for image uploads |
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
 

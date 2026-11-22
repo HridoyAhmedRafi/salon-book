@@ -26,11 +26,18 @@ export interface ImageUploadFieldProps {
   disabled?: boolean;
   /** Lets the parent form disable submit while an upload is in progress. */
   onUploadingChange?: (uploading: boolean) => void;
+  /**
+   * Defers the upload to the caller: the selected file is validated and reported
+   * here instead of being sent to the server. Used by sign-up, where no session
+   * exists yet, so the file is uploaded after the account is created.
+   */
+  onFileSelected?: (file: File | null) => void;
 }
 
 /**
  * File picker that uploads an image to ImgBB and reports the resulting URL.
  * Keeps the form state URL-based, so callers store exactly what they did before.
+ * Pass `onFileSelected` to collect the file and upload it later instead.
  */
 export function ImageUploadField({
   value,
@@ -41,15 +48,19 @@ export function ImageUploadField({
   required,
   disabled,
   onUploadingChange,
+  onFileSelected,
 }: ImageUploadFieldProps) {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const deferred = Boolean(onFileSelected);
   const [uploading, setUploading] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [error, setError] = useState("");
 
   const previewUrl = getValidImageUrl(value);
   const busy = uploading || disabled;
+  const hasImage = deferred ? Boolean(pendingFile) : Boolean(previewUrl);
 
   const setUploadingState = (nextUploading: boolean) => {
     setUploading(nextUploading);
@@ -74,6 +85,13 @@ export function ImageUploadField({
     }
 
     setError("");
+
+    if (deferred) {
+      setPendingFile(file);
+      onFileSelected?.(file);
+      return;
+    }
+
     setUploadingState(true);
 
     try {
@@ -92,6 +110,12 @@ export function ImageUploadField({
 
   const handleRemove = () => {
     setError("");
+
+    if (deferred) {
+      setPendingFile(null);
+      onFileSelected?.(null);
+    }
+
     onChange("");
   };
 
@@ -144,12 +168,12 @@ export function ImageUploadField({
           )}
           {uploading
             ? "Uploading..."
-            : previewUrl
+            : hasImage
               ? "Change image"
               : "Upload image"}
         </Button>
 
-        {previewUrl ? (
+        {hasImage ? (
           <Button
             type="button"
             variant="ghost"
@@ -163,6 +187,13 @@ export function ImageUploadField({
           </Button>
         ) : null}
       </div>
+
+      {deferred && pendingFile ? (
+        <p className="text-xs text-muted-foreground">
+          Selected: <span className="text-foreground">{pendingFile.name}</span>. It
+          will be uploaded when you submit the form.
+        </p>
+      ) : null}
 
       <input
         ref={inputRef}

@@ -17,7 +17,8 @@ import { toast } from "sonner";
 import { FieldError } from "@/components/shared/FieldError";
 import { FormAlert } from "@/components/shared/FormAlert";
 import { ImageUploadField } from "@/components/shared/ImageUploadField";
-import { signIn, signUp } from "@/lib/auth-client";
+import { uploadImageToImgbb } from "@/lib/apis/upload/imgbb";
+import { authClient, signIn, signUp } from "@/lib/auth-client";
 
 const inputClass =
   "w-full rounded-lg border border-border bg-transparent py-2.5 pl-10 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 aria-invalid:border-destructive";
@@ -38,6 +39,7 @@ const SignUpForm = ({ redirectTo }: { redirectTo: string }) => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [image, setImage] = useState("");
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -67,7 +69,6 @@ const SignUpForm = ({ redirectTo }: { redirectTo: string }) => {
     const formData = new FormData(event.currentTarget);
     const name = String(formData.get("name") ?? "").trim();
     const email = String(formData.get("email") ?? "").trim();
-    const trimmedImage = image.trim();
 
     const nextErrors: FieldErrors = {};
 
@@ -97,19 +98,44 @@ const SignUpForm = ({ redirectTo }: { redirectTo: string }) => {
     setSubmitting(true);
 
     try {
-      const { error } = await signUp.email({
-        name,
-        email,
-        password,
-        image: trimmedImage || undefined,
-      });
+      // The photo is uploaded after sign-up: the upload route needs a session,
+      // and sign-up only creates one once the account exists.
+      const { error } = await signUp.email({ name, email, password });
 
       if (error) {
         setFormError(error.message ?? "Could not create your account.");
         return;
       }
 
+      let photoFailed = false;
+
+      if (photoFile) {
+        setUploadingImage(true);
+
+        try {
+          const imageUrl = await uploadImageToImgbb(photoFile);
+          const { error: imageError } = await authClient.updateUser({
+            image: imageUrl,
+          });
+
+          if (imageError) {
+            photoFailed = true;
+          } else {
+            setImage(imageUrl);
+          }
+        } catch {
+          photoFailed = true;
+        } finally {
+          setUploadingImage(false);
+        }
+      }
+
       toast.success("Account created. Welcome to SalonBook!");
+
+      if (photoFailed) {
+        toast.error("Your photo could not be saved. You can add it in Profile.");
+      }
+
       router.push(redirectTo);
       router.refresh();
     } catch {
@@ -207,7 +233,7 @@ const SignUpForm = ({ redirectTo }: { redirectTo: string }) => {
             <ImageUploadField
               value={image}
               onChange={setImage}
-              onUploadingChange={setUploadingImage}
+              onFileSelected={setPhotoFile}
               label="Profile photo (optional)"
               description="PNG, JPEG, WebP or GIF · up to 5 MB."
               showPreview={false}
