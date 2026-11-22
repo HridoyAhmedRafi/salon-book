@@ -1,18 +1,33 @@
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+"use client";
 
-import { auth } from "@/lib/auth";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "@/lib/auth-client";
 
-/** Sends `/dashboard` to the signed-in user's role dashboard. */
-const DashboardIndex = async () => {
-  const session = await auth.api.getSession({ headers: await headers() });
-  const user = session?.user;
+const DashboardIndex = () => {
+  const router = useRouter();
+  const { data: session, isPending } = useSession();
 
-  if (!user) {
-    redirect("/sign-in?redirect=%2Fdashboard");
-  }
+  useEffect(() => {
+    if (isPending) return;
 
-  redirect(`/dashboard/${user.role === "admin" ? "admin" : "customer"}`);
+    const user = session?.user;
+
+    if (!user) {
+      router.replace("/sign-in?redirect=%2Fdashboard");
+      return;
+    }
+
+    router.replace(
+      `/dashboard/${user.role === "admin" ? "admin" : "customer"}`,
+    );
+  }, [session, isPending, router]);
+
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+    </div>
+  );
 };
 
 export default DashboardIndex;

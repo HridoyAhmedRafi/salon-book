@@ -46,7 +46,7 @@ export async function proxy(request: NextRequest) {
   // 1. Cookie na thakle kono API/DB call charai direct /sign-in e pathabe
   const sessionCookie = getSessionCookie(request);
   if (!sessionCookie) {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+    return NextResponse.redirect(new URL("/sign-in?from=proxy", request.url));
   }
 
   // 2. Direct auth.api.getSession() er bodole API route theke session fetch
@@ -63,14 +63,14 @@ export async function proxy(request: NextRequest) {
       session = await res.json();
     }
   } catch {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+    return NextResponse.redirect(new URL("/sign-in?from=proxy", request.url));
   }
 
   const user = session?.user;
   const isBlocked = user?.isBlocked;
 
   if (!user) {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+    return NextResponse.redirect(new URL("/sign-in?from=proxy", request.url));
   }
 
   if (
