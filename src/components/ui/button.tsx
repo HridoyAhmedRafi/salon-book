@@ -43,12 +43,19 @@ function Button({
   className,
   variant = "default",
   size = "default",
+  nativeButton,
+  render,
   ...props
 }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
   return (
     <ButtonPrimitive
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
+      // Base UI assumes a native <button> unless told otherwise. Call sites
+      // that pass `render` swap in a <Link>, so default to non-native and let
+      // an explicit nativeButton prop win.
+      nativeButton={nativeButton ?? (render === undefined)}
+      render={render}
       {...props}
     />
   )

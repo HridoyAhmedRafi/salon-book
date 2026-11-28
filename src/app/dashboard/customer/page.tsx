@@ -17,10 +17,6 @@ const CustomerDashboard = async () => {
   const session = await auth.api.getSession({ headers: await headers() });
   const user = session?.user;
 
-  // if (!user?.id) {
-  //   redirect("/sign-in");
-  // }
-
   return (
     <div className="mx-auto w-full max-w-7xl space-y-8">
       <DashboardPageHeader

@@ -1,5 +1,4 @@
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 import {
   AccountDetailsCard,
@@ -13,10 +12,6 @@ import type { IProfileUser } from "@/types/profile";
 const CustomerProfile = async () => {
   const session = await auth.api.getSession({ headers: await headers() });
   const user = session?.user;
-
-  // if (!user?.id) {
-  //   redirect("/sign-in");
-  // }
 
   const profile: IProfileUser = {
     name: user?.name ?? "",
