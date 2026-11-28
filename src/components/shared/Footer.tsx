@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, MapPin, Phone, Clock } from "lucide-react";
+import { Clock, Mail, MapPin, Phone, Scissors } from "lucide-react";
 import { FaFacebookF, FaInstagram } from "react-icons/fa";
 
 const Footer = () => {
@@ -10,7 +10,14 @@ const Footer = () => {
         <div className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           {/* Logo & Description */}
           <div className="space-y-4">
-            <Link href="/" className="inline-flex items-center">
+            <Link
+              href="/"
+              aria-label="SalonBook home"
+              className="inline-flex items-center gap-2"
+            >
+              <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                <Scissors className="size-5" />
+              </span>
               <span className="text-2xl font-bold tracking-tight">
                 Salon<span className="text-[#d2a01f]">Book</span>
               </span>

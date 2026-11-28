@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { headers } from "next/headers";
+import { Scissors } from "lucide-react";
 
 import { auth } from "@/lib/auth";
 import NavbarActions from "./NavbarActions";
@@ -22,7 +23,14 @@ export async function Navbar() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4">
-        <Link href="/" className="inline-flex items-center">
+        <Link
+          href="/"
+          aria-label="SalonBook home"
+          className="inline-flex items-center gap-2"
+        >
+          <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Scissors className="size-5" />
+          </span>
           <span className="text-2xl font-bold tracking-tight">
             Salon<span className="text-[#d2a01f]">Book</span>
           </span>
