@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { CalendarPlus, CircleAlert } from "lucide-react";
+import { CalendarDays, CalendarPlus, CircleAlert } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 
@@ -24,14 +24,26 @@ const CustomerDashboard = async () => {
         title={`Welcome back, ${user?.name}`}
         description="A clear view of your appointments and what's coming up next."
         actions={
-          <Button
-            size="lg"
-            className="h-10 px-4"
-            render={<Link href="/services" />}
-          >
-            <CalendarPlus />
-            Book a service
-          </Button>
+          <>
+            <Button
+              size="lg"
+              variant="outline"
+              className="h-10 px-4"
+              render={<Link href="/dashboard/customer/my-appointments" />}
+            >
+              <CalendarDays />
+              View Appointments
+            </Button>
+
+            <Button
+              size="lg"
+              className="h-10 px-4"
+              render={<Link href="/services" />}
+            >
+              <CalendarPlus />
+              Book a service
+            </Button>
+          </>
         }
       />
 
