@@ -8,9 +8,8 @@ import {
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { Scissors } from "lucide-react";
 
-import { Button } from "../ui/button";
 import { DashboardNav, Role } from "./DashboardNav";
 
 export async function DashboardSidebar() {
@@ -26,13 +25,22 @@ export async function DashboardSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader />
+      <SidebarHeader>
+        <Link
+          href="/"
+          aria-label="SalonBook home"
+          className="inline-flex items-center gap-2 rounded-md px-1 py-1"
+        >
+          <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Scissors className="size-5" />
+          </span>
+          <span className="text-2xl font-bold tracking-tight">
+            Salon<span className="text-[#d2a01f]">Book</span>
+          </span>
+        </Link>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <Button className="mb-4 cursor-pointer" render={<Link href="/" />}>
-            Home
-          </Button>
-
           <DashboardNav role={role as Role} />
         </SidebarGroup>
       </SidebarContent>
