@@ -83,6 +83,39 @@ export function DashboardStatsSkeleton({
   );
 }
 
+/** Header plus stat cards, used by the dashboard overview/profile fallbacks. */
+export function DashboardOverviewSkeleton({
+  actions = 0,
+  count = 6,
+  columns = 3,
+}: {
+  actions?: 0 | 1 | 2;
+  count?: number;
+  columns?: 3 | 4;
+}) {
+  return (
+    <div className="mx-auto w-full max-w-7xl space-y-8">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="space-y-2">
+          <Skeleton className="h-3 w-28" />
+          <Skeleton className="h-9 w-72" />
+          <Skeleton className="h-4 w-full max-w-xl" />
+        </div>
+
+        {actions > 0 ? (
+          <div className="flex items-center gap-2">
+            {Array.from({ length: actions }).map((_, index) => (
+              <Skeleton key={index} className="h-10 w-36" />
+            ))}
+          </div>
+        ) : null}
+      </div>
+
+      <DashboardStatsSkeleton count={count} columns={columns} />
+    </div>
+  );
+}
+
 /** Form placeholder used while the add-service route is loading. */
 export function DashboardFormSkeleton() {
   return (

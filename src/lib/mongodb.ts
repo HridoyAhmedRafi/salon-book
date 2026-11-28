@@ -10,8 +10,8 @@ const client =
   globalForMongo.mongoClient ??
   new MongoClient(uri, {
     maxPoolSize: 10,
-    minPoolSize: 0,
-    maxIdleTimeMS: 60000,
+    minPoolSize: 1,
+    maxIdleTimeMS: 300000,
     serverSelectionTimeoutMS: 5000,
   });
 

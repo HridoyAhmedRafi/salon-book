@@ -133,7 +133,9 @@ const SignUpForm = ({ redirectTo }: { redirectTo: string }) => {
       toast.success("Account created. Welcome to SalonBook!");
 
       if (photoFailed) {
-        toast.error("Your photo could not be saved. You can add it in Profile.");
+        toast.error(
+          "Your photo could not be saved. You can add it in Profile.",
+        );
       }
 
       router.push(redirectTo);
